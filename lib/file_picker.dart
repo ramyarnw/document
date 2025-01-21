@@ -10,6 +10,8 @@ import 'package:pdf_to_image_converter/pdf_to_image_converter.dart';
 
 import 'models/message.dart';
 
+enum Status { initial, proceed, data }
+
 class FilePickerDemo extends StatefulWidget {
   @override
   _FilePickerDemoState createState() => _FilePickerDemoState();
@@ -37,6 +39,16 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
 
   bool showFile = false;
   bool close = false;
+
+  bool showData = false;
+
+  Status currentStatus = Status.initial;
+
+  void setCurrentStatus(Status s) {
+    currentStatus = s;
+    setState(() {
+    });
+  }
 
   @override
   void initState() {
@@ -104,6 +116,7 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
 
   String? base64Image;
   String content = '';
+
   Future<void> groq() async {
     final response = await http.post(
       Uri.parse('https://api.groq.com/openai/v1/chat/completions'),
@@ -118,7 +131,8 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
             "content": [
               {
                 "type": "text",
-                "text": "Please extract all the text from the provided image. Ensure that any handwritten or printed text, including numbers and special characters, is captured accurately. Remove id and object and just give me plain text",
+                "text":
+                    "Extract all the text from the provided image, including handwritten or printed text, numbers, and special characters. Return the content only, without any additional explanations or identifiers.",
               },
               {
                 "type": "image_url",
@@ -140,9 +154,10 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
     var body = jsonDecode2["choices"];
     var b = (body as List);
 
-    for(var i in b){
+    for (var i in b) {
       content += (i["message"]["content"]).toString();
     }
+    setCurrentStatus(Status.data);
     print(content);
   }
 
@@ -185,6 +200,7 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
       var imageBytes = _image?.map((e) => e).toList() ?? [];
       base64Image = base64Encode(imageBytes);
       //print('base64Image => $base64Image');
+      setCurrentStatus(Status.proceed);
       setState(() {});
     }
   }
@@ -225,60 +241,20 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
                       spacing: 10.0,
                       runSpacing: 10.0,
                       children: <Widget>[
-                        !showFile
-                            ? SizedBox(
-                                width: 120,
-                                child: FloatingActionButton.extended(
-                                    onPressed: () {
-                                      selectPdf();
-                                      setState(() {
-                                        showFile = true;
-                                      });
-                                    },
-                                    label: Text(_multiPick
-                                        ? 'Pick files'
-                                        : 'Pick file'),
-                                    icon: const Icon(Icons.description)),
-                              )
-                            : Column(
-                                children: [
-                                  Text('data: $content'),
-                                  const Text('Preview:'),
-                                  if (_image != null)
-                                    Image(
-                                      image: MemoryImage(_image!),
-                                      height: 450,
-                                    ),
-                                ],
-                              )
+                        if (currentStatus == Status.initial)
+                          PickFile(selectPdf: selectPdf),
+                        if (currentStatus == Status.proceed)
+                          ImagePreview(
+                            groq: groq,
+                            image: _image,
+                          ),
+                        if (currentStatus == Status.data)
+                          Text('Data : $content'),
                       ],
                     ),
                   ),
                 ),
-                if (_converter.isOpen)
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 50,
-                      ),
-                      FloatingActionButton.extended(
-                        onPressed: () => groq(),
-                        label: const Text('Proceed'),
-                        icon: const Icon(Icons.save),
-                      ),
-                      SizedBox(
-                        width: 50,
-                      ),
-                      FloatingActionButton.extended(
-                        onPressed: () {
-                          imageClose();
-                        },
-                        label: const Text('Cancel'),
-                        icon: const Icon(Icons.delete_forever),
-                      )
-                    ],
-                  ),
-                if (_converter.isOpen) ...[
+                if (currentStatus == Status.proceed) ...[
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -311,7 +287,6 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
                 const SizedBox(
                   height: 500,
                 ),
-
                 Builder(
                   builder: (BuildContext context) => _isLoading
                       ? Row(
@@ -410,6 +385,78 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class PickFile extends StatelessWidget {
+  const PickFile({
+    super.key,
+    required this.selectPdf,
+  });
+
+  final void Function() selectPdf;
+
+  @override
+  Widget build(BuildContext context) {
+    bool showFile = false;
+    bool _multiPick = false;
+
+    return SizedBox(
+      width: 120,
+      child: FloatingActionButton.extended(
+          onPressed: () {
+            selectPdf();
+            showFile = true;
+          },
+          label: Text(_multiPick ? 'Pick files' : 'Pick file'),
+          icon: const Icon(Icons.description)),
+    );
+  }
+}
+
+class ImagePreview extends StatelessWidget {
+  const ImagePreview({super.key, required this.groq, this.image,});
+
+  final void Function() groq;
+  final Uint8List? image;
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Column(
+      children: [
+        const Text('Preview:'),
+        if (image != null)
+          Image(
+            image: MemoryImage(image!),
+            height: 450,
+          ),
+        Row(
+          children: [
+            SizedBox(
+              width: 50,
+            ),
+            FloatingActionButton.extended(
+              onPressed: () {
+                groq();
+              },
+              label: const Text('Proceed'),
+              icon: const Icon(Icons.save),
+            ),
+            SizedBox(
+              width: 50,
+            ),
+            FloatingActionButton.extended(
+              onPressed: () {
+                //set null
+              },
+              label: const Text('Cancel'),
+              icon: const Icon(Icons.delete_forever),
+            )
+          ],
+        ),
+      ],
     );
   }
 }
