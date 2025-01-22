@@ -6,7 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:pdf_to_image_converter/pdf_to_image_converter.dart';
+
+//import 'package:pdf_to_image_converter/pdf_to_image_converter.dart';
+import 'package:pdfx/pdfx.dart';
 
 enum Status { initial, proceed, data }
 
@@ -21,17 +23,10 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
-  final PdfImageConverter _converter = PdfImageConverter();
+  //final PdfImageConverter _converter = PdfImageConverter();
   Uint8List? _image;
 
-  Status currentStatus = Status.initial;
-
-  void setCurrentStatus(Status s) {
-    currentStatus = s;
-    setState(() {});
-  }
-
-  File? file;
+  PlatformFile? file;
   bool isProcessing = false;
   String base64Image = '';
   String? output;
@@ -47,20 +42,34 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
         allowMultiple: true,
         type: FileType.custom,
         allowedExtensions: [
-          'jpg',
+          'jpeg',
           'pdf',
         ],
       );
       if (result != null) {
-        PlatformFile file = result.files.first;
-        print(file.extension);
-        print(file.path);
+        file = result.files.first;
+        setState(() {});
+        if (file?.extension == 'pdf') {
+          if (file?.path != null) {
+            final document = await PdfDocument.openFile(file!.path!);
 
-        if (file.extension == 'pdf') {
-          if (file.path != null) {
-            await _converter.openPdf(file.path!);
-            _image = await _converter.renderPage(0);
+            final page = await document.getPage(1);
+
+            final PdfPageImage? i = await page.render(
+              width: page.width * 2, //decrement for less quality
+              height: page.height * 2,
+              format: PdfPageImageFormat.jpeg,
+              backgroundColor: '#ffffff',
+            );
+            //_image = i?.bytes;
+            _image = (i?.bytes);
+            setState(() {});
+            print(_image);
           }
+        } else {
+          _image = File(file?.path??'').readAsBytesSync();
+          setState(() {});
+          print(_image);
         }
       }
       var imageBytes = _image?.map((e) => e).toList() ?? [];
@@ -121,13 +130,13 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
     );
 
     var jsonDecode2 = jsonDecode(response.body);
-    var body = jsonDecode2["choices"];
-    var b = (body as List);
+    List body = jsonDecode2["choices"];
+    var b = body;
 
     for (var i in b) {
       output = (output ?? '') + (i["message"]["content"]).toString();
     }
-    print(output);
+    print('Extracted data =? $output');
   }
 
   @override
@@ -165,11 +174,11 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
                         if (file == null) PickFile(pickFile: pickFile),
                         if (file != null)
                           PreviewFile(
+                            image: _image,
                             onAccept: onAccept,
                             onReject: onReject,
                           ),
-                        if(isProcessing)
-                          CircularProgressIndicator(),
+                        if (isProcessing) CircularProgressIndicator(),
                         if (output != null) Text('data : $output'),
                       ],
                     ),
@@ -217,7 +226,7 @@ class PreviewFile extends StatelessWidget {
     required this.onReject,
   });
 
-  final File? image;
+  final Uint8List? image;
 
   final void Function() onAccept;
   final void Function() onReject;
@@ -227,11 +236,10 @@ class PreviewFile extends StatelessWidget {
     return Column(
       children: [
         const Text('Preview:'),
-        if (image != null)
-          Image(
-            image: FileImage(image!),
-            height: 450,
-          ),
+        if (image != null) Image.memory(image!),
+        //image: FileImage(File.fromRawPath(image!)),
+        // height: 450,
+
         Row(
           children: [
             SizedBox(
