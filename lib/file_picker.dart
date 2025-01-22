@@ -34,7 +34,7 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
   File? file;
   bool isProcessing = false;
   String base64Image = '';
-  String output = '';
+  String? output;
 
   @override
   void initState() {
@@ -125,24 +125,9 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
     var b = (body as List);
 
     for (var i in b) {
-      output += (i["message"]["content"]).toString();
+      output = (output ?? '') + (i["message"]["content"]).toString();
     }
     print(output);
-  }
-
-  Future<void> selectPdf() async {
-    final String path =
-        '/Users/ramya/IdeaProjects/document_scanner/assets/pdf/dummy.pdf';
-    //final path = await PdfPicker.pickPdf();
-    if (path != null) {
-      await _converter.openPdf(path);
-      _image = await _converter.renderPage(0);
-      var imageBytes = _image?.map((e) => e).toList() ?? [];
-      base64Image = base64Encode(imageBytes);
-      //print('base64Image => $base64Image');
-      setCurrentStatus(Status.proceed);
-      setState(() {});
-    }
   }
 
   @override
@@ -183,6 +168,8 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
                             onAccept: onAccept,
                             onReject: onReject,
                           ),
+                        if(isProcessing)
+                          CircularProgressIndicator(),
                         if (output != null) Text('data : $output'),
                       ],
                     ),
