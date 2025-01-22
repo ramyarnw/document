@@ -1,13 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-
-//import 'package:pdf_to_image_converter/pdf_to_image_converter.dart';
 import 'package:pdfx/pdfx.dart';
 
 enum Status { initial, proceed, data }
@@ -23,7 +20,6 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
-  //final PdfImageConverter _converter = PdfImageConverter();
   Uint8List? _image;
 
   PlatformFile? file;
@@ -37,6 +33,9 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
   }
 
   Future<void> pickFile() async {
+    setState(() {
+      isProcessing = true;
+    });
     if (file == null) {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         allowMultiple: true,
@@ -67,17 +66,17 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
             print(_image);
           }
         } else {
-          _image = File(file?.path??'').readAsBytesSync();
+          _image = File(file?.path ?? '').readAsBytesSync();
           setState(() {});
           print(_image);
         }
       }
       var imageBytes = _image?.map((e) => e).toList() ?? [];
       base64Image = base64Encode(imageBytes);
-      setState(() {
-        isProcessing = false;
-      });
     }
+    setState(() {
+      isProcessing = false;
+    });
   }
 
   void onReject() {
@@ -86,11 +85,11 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
     });
   }
 
-  void onAccept() {
+  Future<void> onAccept() async {
     setState(() {
       isProcessing = true;
     });
-    getAIImageToData(base64Image);
+    await getAIImageToData(base64Image);
     setState(() {
       isProcessing = false;
     });
@@ -137,10 +136,16 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
       output = (output ?? '') + (i["message"]["content"]).toString();
     }
     print('Extracted data =? $output');
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
+    bool showFilePicker = file == null && !isProcessing;
+    bool showPreview = file != null && output == null && !isProcessing;
+    bool showProgressIndicator = isProcessing;
+    bool showAIResponse = output != null;
+
     return MaterialApp(
       scaffoldMessengerKey: _scaffoldMessengerKey,
       themeMode: ThemeMode.dark,
@@ -156,38 +161,32 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
         appBar: AppBar(
           title: const Text('Document Scanner '),
         ),
-        body: Padding(
-          padding: const EdgeInsets.only(left: 5.0, right: 5.0),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.only(left: 15.0, right: 15.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(top: 200.0, bottom: 20.0),
-                  child: Center(
-                    child: Wrap(
-                      spacing: 10.0,
-                      runSpacing: 10.0,
-                      children: <Widget>[
-                        if (file == null) PickFile(pickFile: pickFile),
-                        if (file != null)
-                          PreviewFile(
-                            image: _image,
-                            onAccept: onAccept,
-                            onReject: onReject,
-                          ),
-                        if (isProcessing) CircularProgressIndicator(),
-                        if (output != null) Text('data : $output'),
-                      ],
+        body: showFilePicker
+            ? PickFile(
+                pickFile: pickFile,
+              )
+            : showProgressIndicator
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          if (showPreview)
+                            PreviewFile(
+                              image: _image,
+                              onAccept: onAccept,
+                              onReject: onReject,
+                            ),
+                          if (showAIResponse) Text('data : $output'),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -203,17 +202,16 @@ class PickFile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    late bool isProcessing;
-
-    return SizedBox(
-      width: 120,
-      child: FloatingActionButton.extended(
-          onPressed: () {
-            isProcessing = false;
-            pickFile();
-          },
-          label: Text('Pick files'),
-          icon: const Icon(Icons.description)),
+    return Center(
+      child: SizedBox(
+        width: 120,
+        child: FloatingActionButton.extended(
+            onPressed: () {
+              pickFile();
+            },
+            label: Text('Pick files'),
+            icon: const Icon(Icons.description)),
+      ),
     );
   }
 }
@@ -237,18 +235,16 @@ class PreviewFile extends StatelessWidget {
       children: [
         const Text('Preview:'),
         if (image != null) Image.memory(image!),
-        //image: FileImage(File.fromRawPath(image!)),
-        // height: 450,
-
+        const SizedBox(
+          height: 16,
+        ),
         Row(
           children: [
             SizedBox(
               width: 50,
             ),
             FloatingActionButton.extended(
-              onPressed: () {
-                onAccept();
-              },
+              onPressed: onAccept,
               label: const Text('Accept'),
               icon: const Icon(Icons.save),
             ),
@@ -256,9 +252,7 @@ class PreviewFile extends StatelessWidget {
               width: 50,
             ),
             FloatingActionButton.extended(
-              onPressed: () {
-                onReject();
-              },
+              onPressed: onReject,
               label: const Text('Reject'),
               icon: const Icon(Icons.delete_forever),
             )
