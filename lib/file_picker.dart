@@ -1,6 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
 
-import 'package:built_collection/built_collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,11 +8,11 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:pdf_to_image_converter/pdf_to_image_converter.dart';
 
-import 'models/message.dart';
-
 enum Status { initial, proceed, data }
 
 class FilePickerDemo extends StatefulWidget {
+  const FilePickerDemo({super.key});
+
   @override
   _FilePickerDemoState createState() => _FilePickerDemoState();
 }
@@ -20,104 +20,74 @@ class FilePickerDemo extends StatefulWidget {
 class _FilePickerDemoState extends State<FilePickerDemo> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-  final _defaultFileNameController = TextEditingController();
-  final _dialogTitleController = TextEditingController();
-  final _initialDirectoryController = TextEditingController();
-  final _fileExtensionController = TextEditingController();
-  String? _fileName;
-  String? _saveAsFileName;
-  List<PlatformFile>? _paths;
-  String? _directoryPath;
-  String? _extension;
-  bool _isLoading = false;
-  bool _lockParentWindow = false;
-  bool _userAborted = false;
-  bool _multiPick = false;
-  FileType _pickingType = FileType.any;
+
   final PdfImageConverter _converter = PdfImageConverter();
   Uint8List? _image;
-
-  bool showFile = false;
-  bool close = false;
-
-  bool showData = false;
 
   Status currentStatus = Status.initial;
 
   void setCurrentStatus(Status s) {
     currentStatus = s;
-    setState(() {
-    });
+    setState(() {});
   }
+
+  File? file;
+  bool isProcessing = false;
+  String base64Image = '';
+  String output = '';
 
   @override
   void initState() {
     super.initState();
-    _fileExtensionController
-        .addListener(() => _extension = _fileExtensionController.text);
   }
 
-  void _pickFiles() async {
-    _resetState();
-    try {
-      _directoryPath = null;
-      _paths = (await FilePicker.platform.pickFiles(
-        compressionQuality: 30,
-        type: _pickingType,
-        allowMultiple: _multiPick,
-        onFileLoading: (FilePickerStatus status) => print(status),
-        allowedExtensions: (_extension?.isNotEmpty ?? false)
-            ? _extension?.replaceAll(' ', '').split(',')
-            : null,
-        dialogTitle: _dialogTitleController.text,
-        initialDirectory: _initialDirectoryController.text,
-        lockParentWindow: _lockParentWindow,
-      ))
-          ?.files;
-    } on PlatformException catch (e) {
-      _logException('Unsupported operation' + e.toString());
-    } catch (e) {
-      _logException(e.toString());
+  Future<void> pickFile() async {
+    if (file == null) {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.custom,
+        allowedExtensions: [
+          'jpg',
+          'pdf',
+        ],
+      );
+      if (result != null) {
+        PlatformFile file = result.files.first;
+        print(file.extension);
+        print(file.path);
+
+        if (file.extension == 'pdf') {
+          if (file.path != null) {
+            await _converter.openPdf(file.path!);
+            _image = await _converter.renderPage(0);
+          }
+        }
+      }
+      var imageBytes = _image?.map((e) => e).toList() ?? [];
+      base64Image = base64Encode(imageBytes);
+      setState(() {
+        isProcessing = false;
+      });
     }
-    if (!mounted) return;
+  }
+
+  void onReject() {
     setState(() {
-      _isLoading = false;
-      _fileName =
-          _paths != null ? _paths!.map((e) => e.name).toString() : '...';
-      _userAborted = _paths == null;
+      file = null;
     });
   }
 
-  void _clearCachedFiles() async {
-    _resetState();
-    try {
-      bool? result = await FilePicker.platform.clearTemporaryFiles();
-      _scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
-      _scaffoldMessengerKey.currentState?.showSnackBar(
-        SnackBar(
-          content: Text(
-            (result!
-                ? 'Temporary files removed with success.'
-                : 'Failed to clean temporary files'),
-            style: const TextStyle(
-              color: Colors.white,
-            ),
-          ),
-        ),
-      );
-    } on PlatformException catch (e) {
-      _logException('Unsupported operation' + e.toString());
-    } catch (e) {
-      _logException(e.toString());
-    } finally {
-      setState(() => _isLoading = false);
-    }
+  void onAccept() {
+    setState(() {
+      isProcessing = true;
+    });
+    getAIImageToData(base64Image);
+    setState(() {
+      isProcessing = false;
+    });
   }
 
-  String? base64Image;
-  String content = '';
-
-  Future<void> groq() async {
+  Future<String?> getAIImageToData(String base64Image) async {
     final response = await http.post(
       Uri.parse('https://api.groq.com/openai/v1/chat/completions'),
       headers: {
@@ -155,39 +125,9 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
     var b = (body as List);
 
     for (var i in b) {
-      content += (i["message"]["content"]).toString();
+      output += (i["message"]["content"]).toString();
     }
-    setCurrentStatus(Status.data);
-    print(content);
-  }
-
-  void _logException(String message) {
-    print(message);
-    _scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
-    _scaffoldMessengerKey.currentState?.showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _resetState() {
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _isLoading = true;
-      _directoryPath = null;
-      _fileName = null;
-      _paths = null;
-      _saveAsFileName = null;
-      _userAborted = false;
-    });
+    print(output);
   }
 
   Future<void> selectPdf() async {
@@ -203,10 +143,6 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
       setCurrentStatus(Status.proceed);
       setState(() {});
     }
-  }
-
-  void imageClose() {
-    _image = null;
   }
 
   @override
@@ -241,144 +177,16 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
                       spacing: 10.0,
                       runSpacing: 10.0,
                       children: <Widget>[
-                        if (currentStatus == Status.initial)
-                          PickFile(selectPdf: selectPdf),
-                        if (currentStatus == Status.proceed)
-                          ImagePreview(
-                            groq: groq,
-                            image: _image,
+                        if (file == null) PickFile(pickFile: pickFile),
+                        if (file != null)
+                          PreviewFile(
+                            onAccept: onAccept,
+                            onReject: onReject,
                           ),
-                        if (currentStatus == Status.data)
-                          Text('Data : $content'),
+                        if (output != null) Text('data : $output'),
                       ],
                     ),
                   ),
-                ),
-                if (currentStatus == Status.proceed) ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      TextButton.icon(
-                        onPressed: _converter.currentPage > 0
-                            ? () async {
-                                _image = await _converter
-                                    .renderPage(_converter.currentPage - 1);
-                                setState(() {});
-                              }
-                            : null,
-                        icon: const Icon(Icons.chevron_left),
-                        label: const Text('Previous'),
-                      ),
-                      TextButton.icon(
-                        onPressed:
-                            _converter.currentPage < (_converter.pageCount - 1)
-                                ? () async {
-                                    _image = await _converter
-                                        .renderPage(_converter.currentPage + 1);
-                                    setState(() {});
-                                  }
-                                : null,
-                        icon: const Icon(Icons.chevron_right),
-                        label: const Text('Next'),
-                      ),
-                    ],
-                  ),
-                ],
-                const SizedBox(
-                  height: 500,
-                ),
-                Builder(
-                  builder: (BuildContext context) => _isLoading
-                      ? Row(
-                          children: [
-                            Expanded(
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 40.0,
-                                  ),
-                                  child: const CircularProgressIndicator(),
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      : _userAborted
-                          ? Row(
-                              children: [
-                                Expanded(
-                                  child: Center(
-                                    child: SizedBox(
-                                      width: 300,
-                                      child: ListTile(
-                                        leading: Icon(
-                                          Icons.error_outline,
-                                        ),
-                                        contentPadding: EdgeInsets.symmetric(
-                                            vertical: 40.0),
-                                        title: const Text(
-                                          'User has aborted the dialog',
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                          : _directoryPath != null
-                              ? ListTile(
-                                  title: const Text('Directory path'),
-                                  subtitle: Text(_directoryPath!),
-                                )
-                              : _paths != null
-                                  ? Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 20.0,
-                                      ),
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.50,
-                                      child: Scrollbar(
-                                          child: ListView.separated(
-                                        itemCount:
-                                            _paths != null && _paths!.isNotEmpty
-                                                ? _paths!.length
-                                                : 1,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          final bool isMultiPath =
-                                              _paths != null &&
-                                                  _paths!.isNotEmpty;
-                                          final String name =
-                                              'File $index: ${isMultiPath ? _paths!.map((e) => e.name).toList()[index] : _fileName ?? '...'}';
-                                          final path = kIsWeb
-                                              ? null
-                                              : _paths!
-                                                  .map((e) => e.path)
-                                                  .toList()[index]
-                                                  .toString();
-
-                                          return ListTile(
-                                            title: Text(
-                                              name,
-                                            ),
-                                            subtitle: Text(path ?? ''),
-                                          );
-                                        },
-                                        separatorBuilder:
-                                            (BuildContext context, int index) =>
-                                                const Divider(),
-                                      )),
-                                    )
-                                  : _saveAsFileName != null
-                                      ? ListTile(
-                                          title: const Text('Save file'),
-                                          subtitle: Text(_saveAsFileName!),
-                                        )
-                                      : const SizedBox(),
-                ),
-                SizedBox(
-                  height: 40.0,
                 ),
               ],
             ),
@@ -392,44 +200,49 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
 class PickFile extends StatelessWidget {
   const PickFile({
     super.key,
-    required this.selectPdf,
+    required this.pickFile,
   });
 
-  final void Function() selectPdf;
+  final void Function() pickFile;
 
   @override
   Widget build(BuildContext context) {
-    bool showFile = false;
-    bool _multiPick = false;
+    late bool isProcessing;
 
     return SizedBox(
       width: 120,
       child: FloatingActionButton.extended(
           onPressed: () {
-            selectPdf();
-            showFile = true;
+            isProcessing = false;
+            pickFile();
           },
-          label: Text(_multiPick ? 'Pick files' : 'Pick file'),
+          label: Text('Pick files'),
           icon: const Icon(Icons.description)),
     );
   }
 }
 
-class ImagePreview extends StatelessWidget {
-  const ImagePreview({super.key, required this.groq, this.image,});
+class PreviewFile extends StatelessWidget {
+  const PreviewFile({
+    super.key,
+    this.image,
+    required this.onAccept,
+    required this.onReject,
+  });
 
-  final void Function() groq;
-  final Uint8List? image;
+  final File? image;
+
+  final void Function() onAccept;
+  final void Function() onReject;
 
   @override
   Widget build(BuildContext context) {
-
     return Column(
       children: [
         const Text('Preview:'),
         if (image != null)
           Image(
-            image: MemoryImage(image!),
+            image: FileImage(image!),
             height: 450,
           ),
         Row(
@@ -439,9 +252,9 @@ class ImagePreview extends StatelessWidget {
             ),
             FloatingActionButton.extended(
               onPressed: () {
-                groq();
+                onAccept();
               },
-              label: const Text('Proceed'),
+              label: const Text('Accept'),
               icon: const Icon(Icons.save),
             ),
             SizedBox(
@@ -449,9 +262,9 @@ class ImagePreview extends StatelessWidget {
             ),
             FloatingActionButton.extended(
               onPressed: () {
-                //set null
+                onReject();
               },
-              label: const Text('Cancel'),
+              label: const Text('Reject'),
               icon: const Icon(Icons.delete_forever),
             )
           ],
