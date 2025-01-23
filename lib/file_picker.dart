@@ -61,12 +61,12 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
             //_image = i?.bytes;
             _image = (i?.bytes);
             setState(() {});
-            print(_image);
+            //print(_image);
           }
         } else {
           _image = File(file?.path ?? '').readAsBytesSync();
           setState(() {});
-          print(_image);
+         // print(_image);
         }
       }
       var imageBytes = _image?.map((e) => e).toList() ?? [];
@@ -108,7 +108,7 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
               {
                 "type": "text",
                 "text":
-                    "Extract all the text from the provided image, including handwritten or printed text, numbers, and special characters. Return the content only in markdown format, without any additional explanations or identifiers.",
+                    "Extract all the text from the provided image, including handwritten or printed text, numbers, and special characters. Return the content only in proper markdown format, without any additional explanations or identifiers.",
               },
               {
                 "type": "image_url",
@@ -133,7 +133,7 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
     for (var i in b) {
       output = (output ?? '') + (i["message"]["content"]).toString();
     }
-    print('Extracted data =? $output');
+    print('Extracted data => $output');
     return null;
   }
 
