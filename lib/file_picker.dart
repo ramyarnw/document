@@ -7,8 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:pdfx/pdfx.dart';
 
-enum Status { initial, proceed, data }
-
 class FilePickerDemo extends StatefulWidget {
   const FilePickerDemo({super.key});
 
@@ -110,7 +108,7 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
               {
                 "type": "text",
                 "text":
-                    "Extract all the text from the provided image, including handwritten or printed text, numbers, and special characters. Return the content only, without any additional explanations or identifiers.",
+                    "Extract all the text from the provided image, including handwritten or printed text, numbers, and special characters. Return the content only in markdown format, without any additional explanations or identifiers.",
               },
               {
                 "type": "image_url",
@@ -182,7 +180,20 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
                               onAccept: onAccept,
                               onReject: onReject,
                             ),
-                          if (showAIResponse) Text('data : $output'),
+                          if (showAIResponse)
+                            Column(children: [
+                              Text('data : $output'),
+                              FloatingActionButton.extended(
+                                onPressed: () {
+                                  setState(() {
+                                    file = null;
+                                  });
+                                  if (file == null) showFilePicker;
+                                },
+                                label: const Text('Reset'),
+                                icon: const Icon(Icons.lock_reset),
+                              )
+                            ])
                         ],
                       ),
                     ),
@@ -260,5 +271,26 @@ class PreviewFile extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class ExtractedData extends StatelessWidget {
+  const ExtractedData({
+    super.key,
+    required this.output,
+  });
+
+  final String? output;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Text('data : $output'),
+      FloatingActionButton.extended(
+        onPressed: () {},
+        label: const Text('Reset'),
+        icon: const Icon(Icons.lock_reset),
+      )
+    ]);
   }
 }
