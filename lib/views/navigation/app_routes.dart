@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:document_scanner/provider/provider_utils.dart';
+import 'package:document_scanner/views/screens/file_picker.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../ui.dart' hide RouterUtils;
@@ -91,7 +92,7 @@ abstract class UnauthenticatedRouteData extends AppRouterData {
 class HomePageRoute extends AuthenticatedRouteData {
   @override
   Widget buildWidget(BuildContext context, GoRouterState state) {
-    return const HomePage();
+    return const FilePickerDemo();
   }
 }
 

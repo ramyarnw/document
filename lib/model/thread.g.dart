@@ -22,7 +22,8 @@ class _$ThreadSerializer implements StructuredSerializer<Thread> {
       serializers.serialize(object.id, specifiedType: const FullType(String)),
       'image',
       serializers.serialize(object.image,
-          specifiedType: const FullType(String)),
+          specifiedType:
+              const FullType(BuiltList, const [const FullType(int)])),
       'aiData',
       serializers.serialize(object.aiData,
           specifiedType: const FullType(String)),
@@ -47,8 +48,10 @@ class _$ThreadSerializer implements StructuredSerializer<Thread> {
               specifiedType: const FullType(String))! as String;
           break;
         case 'image':
-          result.image = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
+          result.image.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(BuiltList, const [const FullType(int)]))!
+              as BuiltList<Object?>);
           break;
         case 'aiData':
           result.aiData = serializers.deserialize(value,
@@ -65,7 +68,7 @@ class _$Thread extends Thread {
   @override
   final String id;
   @override
-  final String image;
+  final BuiltList<int> image;
   @override
   final String aiData;
 
@@ -122,9 +125,9 @@ class ThreadBuilder implements Builder<Thread, ThreadBuilder> {
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
 
-  String? _image;
-  String? get image => _$this._image;
-  set image(String? image) => _$this._image = image;
+  ListBuilder<int>? _image;
+  ListBuilder<int> get image => _$this._image ??= new ListBuilder<int>();
+  set image(ListBuilder<int>? image) => _$this._image = image;
 
   String? _aiData;
   String? get aiData => _$this._aiData;
@@ -136,7 +139,7 @@ class ThreadBuilder implements Builder<Thread, ThreadBuilder> {
     final $v = _$v;
     if ($v != null) {
       _id = $v.id;
-      _image = $v.image;
+      _image = $v.image.toBuilder();
       _aiData = $v.aiData;
       _$v = null;
     }
@@ -158,14 +161,26 @@ class ThreadBuilder implements Builder<Thread, ThreadBuilder> {
   Thread build() => _build();
 
   _$Thread _build() {
-    final _$result = _$v ??
-        new _$Thread._(
-          id: BuiltValueNullFieldError.checkNotNull(id, r'Thread', 'id'),
-          image:
-              BuiltValueNullFieldError.checkNotNull(image, r'Thread', 'image'),
-          aiData: BuiltValueNullFieldError.checkNotNull(
-              aiData, r'Thread', 'aiData'),
-        );
+    _$Thread _$result;
+    try {
+      _$result = _$v ??
+          new _$Thread._(
+            id: BuiltValueNullFieldError.checkNotNull(id, r'Thread', 'id'),
+            image: image.build(),
+            aiData: BuiltValueNullFieldError.checkNotNull(
+                aiData, r'Thread', 'aiData'),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'image';
+        image.build();
+      } catch (e) {
+        throw new BuiltValueNestedFieldError(
+            r'Thread', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

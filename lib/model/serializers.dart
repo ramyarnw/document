@@ -7,7 +7,6 @@ import 'package:document_scanner/model/thread.dart';
 
 import 'api_error.dart';
 import 'app_state.dart';
-import 'data.dart';
 import 'message.dart';
 
 
@@ -18,7 +17,6 @@ part 'serializers.g.dart';
   Content,
   ImageUrl,
   Thread,
-  Data,
   AppState,
   ApiError,
 ])

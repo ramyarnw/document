@@ -22,14 +22,14 @@ class _$AppStateSerializer implements StructuredSerializer<AppState> {
       serializers.serialize(object.threads,
           specifiedType:
               const FullType(BuiltList, const [const FullType(Thread)])),
-      'datas',
-      serializers.serialize(object.datas,
-          specifiedType:
-              const FullType(BuiltList, const [const FullType(Data)])),
-      'count',
-      serializers.serialize(object.count, specifiedType: const FullType(int)),
     ];
-
+    Object? value;
+    value = object.count;
+    if (value != null) {
+      result
+        ..add('count')
+        ..add(serializers.serialize(value, specifiedType: const FullType(int)));
+    }
     return result;
   }
 
@@ -50,15 +50,9 @@ class _$AppStateSerializer implements StructuredSerializer<AppState> {
                       BuiltList, const [const FullType(Thread)]))!
               as BuiltList<Object?>);
           break;
-        case 'datas':
-          result.datas.replace(serializers.deserialize(value,
-                  specifiedType:
-                      const FullType(BuiltList, const [const FullType(Data)]))!
-              as BuiltList<Object?>);
-          break;
         case 'count':
           result.count = serializers.deserialize(value,
-              specifiedType: const FullType(int))! as int;
+              specifiedType: const FullType(int)) as int?;
           break;
       }
     }
@@ -71,19 +65,13 @@ class _$AppState extends AppState {
   @override
   final BuiltList<Thread> threads;
   @override
-  final BuiltList<Data> datas;
-  @override
-  final int count;
+  final int? count;
 
   factory _$AppState([void Function(AppStateBuilder)? updates]) =>
       (new AppStateBuilder()..update(updates))._build();
 
-  _$AppState._(
-      {required this.threads, required this.datas, required this.count})
-      : super._() {
+  _$AppState._({required this.threads, this.count}) : super._() {
     BuiltValueNullFieldError.checkNotNull(threads, r'AppState', 'threads');
-    BuiltValueNullFieldError.checkNotNull(datas, r'AppState', 'datas');
-    BuiltValueNullFieldError.checkNotNull(count, r'AppState', 'count');
   }
 
   @override
@@ -98,7 +86,6 @@ class _$AppState extends AppState {
     if (identical(other, this)) return true;
     return other is AppState &&
         threads == other.threads &&
-        datas == other.datas &&
         count == other.count;
   }
 
@@ -106,7 +93,6 @@ class _$AppState extends AppState {
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, threads.hashCode);
-    _$hash = $jc(_$hash, datas.hashCode);
     _$hash = $jc(_$hash, count.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -116,7 +102,6 @@ class _$AppState extends AppState {
   String toString() {
     return (newBuiltValueToStringHelper(r'AppState')
           ..add('threads', threads)
-          ..add('datas', datas)
           ..add('count', count))
         .toString();
   }
@@ -130,10 +115,6 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
       _$this._threads ??= new ListBuilder<Thread>();
   set threads(ListBuilder<Thread>? threads) => _$this._threads = threads;
 
-  ListBuilder<Data>? _datas;
-  ListBuilder<Data> get datas => _$this._datas ??= new ListBuilder<Data>();
-  set datas(ListBuilder<Data>? datas) => _$this._datas = datas;
-
   int? _count;
   int? get count => _$this._count;
   set count(int? count) => _$this._count = count;
@@ -144,7 +125,6 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
     final $v = _$v;
     if ($v != null) {
       _threads = $v.threads.toBuilder();
-      _datas = $v.datas.toBuilder();
       _count = $v.count;
       _$v = null;
     }
@@ -171,17 +151,13 @@ class AppStateBuilder implements Builder<AppState, AppStateBuilder> {
       _$result = _$v ??
           new _$AppState._(
             threads: threads.build(),
-            datas: datas.build(),
-            count: BuiltValueNullFieldError.checkNotNull(
-                count, r'AppState', 'count'),
+            count: count,
           );
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'threads';
         threads.build();
-        _$failedField = 'datas';
-        datas.build();
       } catch (e) {
         throw new BuiltValueNestedFieldError(
             r'AppState', _$failedField, e.toString());

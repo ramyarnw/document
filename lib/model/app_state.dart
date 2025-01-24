@@ -5,7 +5,6 @@ import 'package:built_value/serializer.dart';
 import 'package:document_scanner/model/serializers.dart';
 import 'package:document_scanner/model/thread.dart';
 
-import 'data.dart';
 
 part 'app_state.g.dart';
 
@@ -25,10 +24,9 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
 
   static Serializer<AppState> get serializer => _$appStateSerializer;
   BuiltList<Thread> get threads;
-  BuiltList<Data> get datas;
-  int get count;
+  int? get count;
 
-  BuiltList<Data> getDataForThread(String id) =>
-      datas.where((Data d)=> d.threadId == id).toBuiltList();
+   Thread? getThreadById(String id) =>
+      threads.where(( Thread t)=> t.id == id).firstOrNull;
 
 }

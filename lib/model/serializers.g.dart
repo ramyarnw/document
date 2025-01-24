@@ -10,7 +10,6 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..add(ApiError.serializer)
       ..add(AppState.serializer)
       ..add(Content.serializer)
-      ..add(Data.serializer)
       ..add(ImageUrl.serializer)
       ..add(Message.serializer)
       ..add(Thread.serializer)
@@ -21,8 +20,8 @@ Serializers _$serializers = (new Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(Thread)]),
           () => new ListBuilder<Thread>())
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(Data)]),
-          () => new ListBuilder<Data>()))
+          const FullType(BuiltList, const [const FullType(int)]),
+          () => new ListBuilder<int>()))
     .build();
 
 // ignore_for_file: deprecated_member_use_from_same_package,type=lint

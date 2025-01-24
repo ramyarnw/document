@@ -6,7 +6,6 @@ import '../core/services/local_sore_service.dart';
 import '../core/view_model/view_model.dart';
 import '../data/repository.dart';
 import '../model/app_state.dart';
-import '../model/data.dart';
 import '../provider/app_state_notifier.dart';
 import '../ui.dart';
 
@@ -66,9 +65,6 @@ class AppViewModel extends AppStateNotifier<AppState>
   }
   Future<void> clearThread() async {
     await localStoreService.clearThread();
-  }
-  Future<void> getDataForThread({required String threadId}) async {
-    await localStoreService.getDataForThread(threadId: threadId);
   }
 
 }

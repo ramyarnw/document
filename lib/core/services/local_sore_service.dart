@@ -1,7 +1,6 @@
 
 import 'package:built_collection/built_collection.dart';
 
-import '../../model/data.dart';
 import '../../model/thread.dart';
 import 'app_service.dart';
 
@@ -18,5 +17,4 @@ abstract class LocalStoreService extends AppService {
 
   Future<void> clearThread();
 
-  Future<BuiltList<Data>> getDataForThread({required String threadId});
 }

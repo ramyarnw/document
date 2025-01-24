@@ -1,19 +1,18 @@
-
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:built_collection/built_collection.dart';
 import 'package:localstore/localstore.dart';
 
 import '../core/services/local_sore_service.dart';
-import '../model/data.dart';
 import '../model/thread.dart';
 
 class LocalStoreServiceImpl implements LocalStoreService {
   Localstore get db => Localstore.instance;
 
   CollectionRef get threads => db.collection('thread');
-  CollectionRef get datas => db.collection('data');
-
 
   final StreamController<BuiltList<Thread>> _threadController =
       StreamController<BuiltList<Thread>>.broadcast();
@@ -52,23 +51,12 @@ class LocalStoreServiceImpl implements LocalStoreService {
   Future<void> dispose() async {}
 
   @override
-  Future<BuiltList<Data>> getDataForThread({required String threadId}) async{
-    final Map<String, dynamic>? data =
-    await datas.where('threadId', isEqualTo: threadId).get();
-    return (data ?? <String,dynamic>{})
-        .values
-        .cast<Map<String, dynamic>>()
-        .map(Data.fromJson)
-        .toBuiltList();
-  }
-
-  @override
   Future<Thread> getThread({required String id}) async {
     final Map<String, dynamic>? data = await threads.doc(id).get();
     if (data == null) {
       throw 'thread not available';
     }
-    return Thread.fromJson(data);
+    return  Thread.fromJson(data);
   }
 
   @override
@@ -77,7 +65,7 @@ class LocalStoreServiceImpl implements LocalStoreService {
   @override
   Stream<BuiltList<Thread>> listenThread() {
     _refreshThread();
-     return _threadController.stream;
+    return _threadController.stream;
   }
 
   @override

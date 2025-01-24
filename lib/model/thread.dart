@@ -1,5 +1,6 @@
 
 
+import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:document_scanner/model/serializers.dart';
@@ -22,6 +23,6 @@ abstract class Thread implements Built<Thread, ThreadBuilder> {
 
   static Serializer<Thread> get serializer => _$threadSerializer;
   String get id;
-  String get image;
+  BuiltList<int> get image;
   String get aiData;
 }

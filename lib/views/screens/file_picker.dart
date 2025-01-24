@@ -1,23 +1,33 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:built_collection/built_collection.dart';
+import 'package:document_scanner/provider/provider_utils.dart';
+import 'package:document_scanner/views/components/Threads.dart';
+import 'package:document_scanner/views/mixin/threadMixin.dart';
+import 'package:document_scanner/views/widgets/mixins.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:http/http.dart' as http;
 import 'package:pdfx/pdfx.dart';
 
+import '../../model/thread.dart';
+
 class FilePickerDemo extends StatefulWidget {
-  const FilePickerDemo({super.key});
+  const FilePickerDemo({
+    super.key,
+  });
 
   @override
   _FilePickerDemoState createState() => _FilePickerDemoState();
 }
 
-class _FilePickerDemoState extends State<FilePickerDemo> {
+class _FilePickerDemoState extends State<FilePickerDemo>
+    with StateMixin, ThreadMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-
   Uint8List? _image;
 
   PlatformFile? file;
@@ -66,7 +76,7 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
         } else {
           _image = File(file?.path ?? '').readAsBytesSync();
           setState(() {});
-         // print(_image);
+          // print(_image);
         }
       }
       var imageBytes = _image?.map((e) => e).toList() ?? [];
@@ -177,23 +187,10 @@ class _FilePickerDemoState extends State<FilePickerDemo> {
                           if (showPreview)
                             PreviewFile(
                               image: _image,
-                              onAccept: onAccept,
-                              onReject: onReject,
                             ),
-                          if (showAIResponse)
-                            Column(children: [
-                              Text('data : $output'),
-                              FloatingActionButton.extended(
-                                onPressed: () {
-                                  setState(() {
-                                    file = null;
-                                  });
-                                  if (file == null) showFilePicker;
-                                },
-                                label: const Text('Reset'),
-                                icon: const Icon(Icons.lock_reset),
-                              )
-                            ])
+                          PreviewButtons(
+                              onAccept: onAccept, onReject: onReject),
+                          if (showAIResponse) AiData(),
                         ],
                       ),
                     ),
@@ -231,14 +228,9 @@ class PreviewFile extends StatelessWidget {
   const PreviewFile({
     super.key,
     this.image,
-    required this.onAccept,
-    required this.onReject,
   });
 
   final Uint8List? image;
-
-  final void Function() onAccept;
-  final void Function() onReject;
 
   @override
   Widget build(BuildContext context) {
@@ -249,12 +241,79 @@ class PreviewFile extends StatelessWidget {
         const SizedBox(
           height: 16,
         ),
+      ],
+    );
+  }
+}
+
+class AiData extends StatefulWidget {
+  const AiData({
+    super.key,
+    this.output,
+    this.file,
+  });
+
+  final String? output;
+  final PlatformFile? file;
+
+  @override
+  State<AiData> createState() => _AiDataState();
+}
+
+class _AiDataState extends State<AiData> with StateMixin, ThreadMixin {
+  void _createThread() {
+    final BuiltList<int>? image = widget.file?.bytes?.toBuiltList();
+    var thread = Thread((t) => t
+      ..image = image?.toBuilder()
+      ..aiData = widget.output);
+    createThread(thread: thread);
+  }
+
+  bool isLoading = false;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Markdown(
+          data: '${widget.output}',
+        ),
+        ElevatedButton(
+            onPressed: () {
+              setState(() {
+                isLoading = true;
+              });
+              _createThread();
+              setState(() {
+                isLoading = false;
+              });
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (BuildContext context) {
+                return const FilePickerDemo();
+              }));
+            },
+            child: Text('Save')),
+      ],
+    );
+  }
+}
+
+class PreviewButtons extends StatelessWidget {
+  const PreviewButtons(
+      {super.key, required this.onAccept, required this.onReject});
+
+  final void Function() onAccept;
+  final void Function() onReject;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 50,
+        ),
         Row(
           children: [
-            SizedBox(
-              width: 50,
-            ),
-            FloatingActionButton.extended(
+            ElevatedButton.icon(
               onPressed: onAccept,
               label: const Text('Accept'),
               icon: const Icon(Icons.save),
@@ -262,7 +321,7 @@ class PreviewFile extends StatelessWidget {
             SizedBox(
               width: 50,
             ),
-            FloatingActionButton.extended(
+            ElevatedButton.icon(
               onPressed: onReject,
               label: const Text('Reject'),
               icon: const Icon(Icons.delete_forever),
@@ -271,26 +330,5 @@ class PreviewFile extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-class ExtractedData extends StatelessWidget {
-  const ExtractedData({
-    super.key,
-    required this.output,
-  });
-
-  final String? output;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(children: [
-      Text('data : $output'),
-      FloatingActionButton.extended(
-        onPressed: () {},
-        label: const Text('Reset'),
-        icon: const Icon(Icons.lock_reset),
-      )
-    ]);
   }
 }
