@@ -30,6 +30,7 @@ class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
     final BuiltList<int>? image = widget.file?.bytes?.toBuiltList();
     Thread thread = Thread(
       (t) => t
+        ..id = ''
         ..image = image?.toBuilder()
         ..aiData = widget.output,
     );
@@ -43,20 +44,20 @@ class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
     return Column(
       children: [
         Text(
-            widget.output ?? '',
+          widget.output ?? '',
         ),
         const SizedBox(
           height: 16,
         ),
         ElevatedButton(
           onPressed: () async {
-            var go = context.go;
             isLoading = true;
             refresh();
             await _createThread();
             isLoading = false;
             refresh();
-            go(HomePageRoute().location);
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => HomePage()));
           },
           child: AppText(
             'Save',

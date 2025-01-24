@@ -11,25 +11,41 @@ import '../widgets/app_progress_indicator.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/mixins.dart';
 
-class Threads extends StatelessWidget {
+class Threads extends StatefulWidget {
   const Threads({
     super.key,
   });
 
-  bool get isLoading => false;
+  @override
+  State<Threads> createState() => _ThreadsState();
+}
+
+class _ThreadsState extends State<Threads> with StateMixin, ThreadMixin {
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+  Future<void> getData() async {
+    setLoading();
+    listenThread();
+    resetLoading();
+  }
 
   @override
   Widget build(BuildContext context) {
     final BuiltList<Thread> threads = context.appState.threads;
-
     return AppScaffold(
       appBar: ApplicationAppBar(
         title: Text(
           'Threads',
         ),
       ),
-      body: isLoading
-          ? const Center(child: AppProgressIndicator())
+      body: loading
+          ? const Center(
+              child: AppProgressIndicator(),
+            )
           : Container(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 16),
               child: threads.isEmpty
@@ -68,33 +84,46 @@ class _ThreadTileState extends State<ThreadTile> with StateMixin, ThreadMixin {
   Widget build(BuildContext context) {
     PlatformFile? file;
 
-    return InkWell(
-      child: Row(
-        children: [
-          Icon(
-            Icons.file_open,
-          ),
-          Text(file!.name),
-          InkWell(
-            onTap: () async {
-              DeleteAlertBox(
-                deleteThread: deleteThread,
-                id: widget.thread.id,
-              );
-              //await removeThread();
-            },
-            child: Icon(Icons.delete),
-          ),
-        ],
+    return SizedBox(
+      width: 40,
+      height: 40,
+      child: InkWell(
+        child: Row(
+          children: [
+            Icon(
+              Icons.file_open,
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+            Text('file name'),
+            Spacer(),
+            InkWell(
+              onTap: () async {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return DeleteAlertBox(
+                      deleteThread: deleteThread,
+                      id: widget.thread.id,
+                    );
+                  },
+                );
+                //await removeThread();
+              },
+              child: Icon(Icons.delete),
+            ),
+          ],
+        ),
+        onTap: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (BuildContext context) {
+            return ThreadPage(
+              id: widget.thread.id,
+            );
+          }));
+        },
       ),
-      onTap: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (BuildContext context) {
-          return ThreadPage(
-            id: widget.thread.id,
-          );
-        }));
-      },
     );
   }
 }
@@ -111,12 +140,18 @@ class DeleteAlertBox extends StatelessWidget {
     return AlertDialog(
       title: Column(
         children: [
-          Text('Are you Sure Want To Delete The File'),
+          Text(
+            'Are you Sure Want To Delete The File',
+            style: TextStyle(
+              fontSize: 12,
+            ),
+          ),
           Row(
             children: [
               ElevatedButton(
                   onPressed: () {
                     deleteThread(id: id);
+                    Navigator.pop(context);
                   },
                   child: Text('Delete')),
               ElevatedButton(

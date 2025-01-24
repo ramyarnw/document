@@ -38,10 +38,6 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
   String base64Image = '';
   String? output;
 
-  @override
-  void initState() {
-    super.initState();
-  }
 
   Future<void> pickFile() async {
     setState(() {
