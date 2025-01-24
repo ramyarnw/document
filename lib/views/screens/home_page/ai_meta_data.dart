@@ -1,4 +1,6 @@
 import 'package:built_collection/built_collection.dart';
+import 'package:document_scanner/views/navigation/app_routes.dart';
+import 'package:document_scanner/views/navigation/router_utils.dart';
 import 'package:file_picker/file_picker.dart';
 
 import '../../../model/thread.dart';
@@ -24,14 +26,14 @@ class AIMetaData extends StatefulWidget {
 }
 
 class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
-  void _createThread() {
+  Future<void> _createThread() async {
     final BuiltList<int>? image = widget.file?.bytes?.toBuiltList();
     Thread thread = Thread(
       (t) => t
         ..image = image?.toBuilder()
         ..aiData = widget.output,
     );
-    createThread(thread: thread);
+    await createThread(thread: thread);
   }
 
   bool isLoading = false;
@@ -40,26 +42,25 @@ class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        AppMarkdown(
-          text: widget.output ?? '',
+        Text(
+            widget.output ?? '',
+        ),
+        const SizedBox(
+          height: 16,
         ),
         ElevatedButton(
-          onPressed: () {
+          onPressed: () async {
+            var go = context.go;
             isLoading = true;
             refresh();
-            _createThread();
+            await _createThread();
             isLoading = false;
             refresh();
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) {
-                  return const HomePage();
-                },
-              ),
-            );
+            go(HomePageRoute().location);
           },
-          child: AppText('Save'),
+          child: AppText(
+            'Save',
+          ),
         ),
       ],
     );

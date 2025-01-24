@@ -205,7 +205,10 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
                               onReject: onReject,
                             ),
                           ],
-                          if (showAIResponse) AIMetaData(),
+                          if (showAIResponse)
+                            AIMetaData(
+                              output: output,
+                            ),
                         ],
                       ),
                     ),
