@@ -37,7 +37,7 @@ class Threads extends StatelessWidget {
                       child: Text('No Threads'),
                     )
                   : ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
+                      physics: NeverScrollableScrollPhysics(),
                       itemCount: threads.length,
                       itemBuilder: (BuildContext context, int index) {
                         return ThreadTile(
@@ -52,22 +52,21 @@ class Threads extends StatelessWidget {
 class ThreadTile extends StatefulWidget {
   const ThreadTile({
     super.key,
-    required this.thread, this.file,
+    required this.thread,
+    this.file,
   });
 
   final Thread thread;
   final PlatformFile? file;
-
 
   @override
   State<ThreadTile> createState() => _ThreadTileState();
 }
 
 class _ThreadTileState extends State<ThreadTile> with StateMixin, ThreadMixin {
-
   @override
   Widget build(BuildContext context) {
-     PlatformFile? file;
+    PlatformFile? file;
 
     return InkWell(
       child: Row(
@@ -120,9 +119,11 @@ class DeleteAlertBox extends StatelessWidget {
                     deleteThread(id: id);
                   },
                   child: Text('Delete')),
-              ElevatedButton(onPressed: () {
-                Navigator.pop(context);
-              }, child: Text('Cancel')),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Cancel')),
             ],
           ),
         ],

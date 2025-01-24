@@ -1,11 +1,12 @@
 import 'package:document_scanner/provider/provider_utils.dart';
 import 'package:document_scanner/views/mixin/threadMixin.dart';
-import 'package:document_scanner/views/screens/file_picker.dart';
 import 'package:document_scanner/views/widgets/app_scaffold.dart';
 import 'package:document_scanner/views/widgets/mixins.dart';
 
 import '../../model/thread.dart';
 import '../../ui.dart';
+import 'home_page/ai_meta_data.dart';
+import 'home_page/file_viewer.dart';
 
 class ThreadPage extends StatefulWidget {
   final String id;
@@ -36,8 +37,10 @@ class _ThreadPageState extends State<ThreadPage> with StateMixin, ThreadMixin {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              PreviewFile(image: _image),
-              AiData(
+              FileViewer(
+                image: _image,
+              ),
+              AIMetaData(
                 output: thread?.aiData,
               ),
             ],

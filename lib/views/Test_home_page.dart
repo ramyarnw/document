@@ -8,16 +8,16 @@ import 'package:document_scanner/views/widgets/extensions.dart';
 import '../ui.dart';
 import 'navigation/app_routes.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key, this.title});
+class TestHomePage extends StatefulWidget {
+  const TestHomePage({super.key, this.title});
 
   final String? title;
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<TestHomePage> createState() => _TestHomePageState();
 }
 
-class _HomePageState extends State<HomePage> with AppProviderMixin<HomePage> {
+class _TestHomePageState extends State<TestHomePage> with AppProviderMixin<TestHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

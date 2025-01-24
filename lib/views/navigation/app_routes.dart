@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:document_scanner/provider/provider_utils.dart';
-import 'package:document_scanner/views/screens/file_picker.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../ui.dart' hide RouterUtils;
-import '../home_page.dart';
+import '../Test_home_page.dart';
 import '../profile_page.dart';
+import '../screens/home_page/home_page.dart';
 import '../terms_page.dart';
 
 part 'app_routes.g.dart';
@@ -92,7 +92,7 @@ abstract class UnauthenticatedRouteData extends AppRouterData {
 class HomePageRoute extends AuthenticatedRouteData {
   @override
   Widget buildWidget(BuildContext context, GoRouterState state) {
-    return const FilePickerDemo();
+    return const HomePage();
   }
 }
 

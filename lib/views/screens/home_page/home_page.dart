@@ -4,6 +4,8 @@ import 'package:built_collection/built_collection.dart';
 import 'package:document_scanner/provider/provider_utils.dart';
 import 'package:document_scanner/views/components/Threads.dart';
 import 'package:document_scanner/views/mixin/threadMixin.dart';
+import 'package:document_scanner/views/screens/home_page/pick_file_widget.dart';
+import 'package:document_scanner/views/screens/home_page/preview_buttons.dart';
 import 'package:document_scanner/views/widgets/mixins.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -13,19 +15,20 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:http/http.dart' as http;
 import 'package:pdfx/pdfx.dart';
 
-import '../../model/thread.dart';
+import '../../../model/thread.dart';
+import 'ai_meta_data.dart';
+import 'file_viewer.dart';
 
-class FilePickerDemo extends StatefulWidget {
-  const FilePickerDemo({
+class HomePage extends StatefulWidget {
+  const HomePage({
     super.key,
   });
 
   @override
-  _FilePickerDemoState createState() => _FilePickerDemoState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _FilePickerDemoState extends State<FilePickerDemo>
-    with StateMixin, ThreadMixin {
+class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   Uint8List? _image;
@@ -154,6 +157,8 @@ class _FilePickerDemoState extends State<FilePickerDemo>
     bool showProgressIndicator = isProcessing;
     bool showAIResponse = output != null;
 
+    bool showThread = file == null;
+
     return MaterialApp(
       scaffoldMessengerKey: _scaffoldMessengerKey,
       themeMode: ThemeMode.dark,
@@ -169,10 +174,14 @@ class _FilePickerDemoState extends State<FilePickerDemo>
         appBar: AppBar(
           title: const Text('Document Scanner '),
         ),
-        body: showFilePicker
-            ? PickFile(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: showFilePicker
+            ? PickFileWidget(
                 pickFile: pickFile,
               )
+            : null,
+        body: showThread
+            ? Threads()
             : showProgressIndicator
                 ? Center(
                     child: CircularProgressIndicator(),
@@ -185,150 +194,19 @@ class _FilePickerDemoState extends State<FilePickerDemo>
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           if (showPreview)
-                            PreviewFile(
+                            FileViewer(
                               image: _image,
                             ),
                           PreviewButtons(
-                              onAccept: onAccept, onReject: onReject),
-                          if (showAIResponse) AiData(),
+                            onAccept: onAccept,
+                            onReject: onReject,
+                          ),
+                          if (showAIResponse) AIMetaData(),
                         ],
                       ),
                     ),
                   ),
       ),
-    );
-  }
-}
-
-class PickFile extends StatelessWidget {
-  const PickFile({
-    super.key,
-    required this.pickFile,
-  });
-
-  final void Function() pickFile;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        width: 120,
-        child: FloatingActionButton.extended(
-            onPressed: () {
-              pickFile();
-            },
-            label: Text('Pick files'),
-            icon: const Icon(Icons.description)),
-      ),
-    );
-  }
-}
-
-class PreviewFile extends StatelessWidget {
-  const PreviewFile({
-    super.key,
-    this.image,
-  });
-
-  final Uint8List? image;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text('Preview:'),
-        if (image != null) Image.memory(image!),
-        const SizedBox(
-          height: 16,
-        ),
-      ],
-    );
-  }
-}
-
-class AiData extends StatefulWidget {
-  const AiData({
-    super.key,
-    this.output,
-    this.file,
-  });
-
-  final String? output;
-  final PlatformFile? file;
-
-  @override
-  State<AiData> createState() => _AiDataState();
-}
-
-class _AiDataState extends State<AiData> with StateMixin, ThreadMixin {
-  void _createThread() {
-    final BuiltList<int>? image = widget.file?.bytes?.toBuiltList();
-    var thread = Thread((t) => t
-      ..image = image?.toBuilder()
-      ..aiData = widget.output);
-    createThread(thread: thread);
-  }
-
-  bool isLoading = false;
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Markdown(
-          data: '${widget.output}',
-        ),
-        ElevatedButton(
-            onPressed: () {
-              setState(() {
-                isLoading = true;
-              });
-              _createThread();
-              setState(() {
-                isLoading = false;
-              });
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (BuildContext context) {
-                return const FilePickerDemo();
-              }));
-            },
-            child: Text('Save')),
-      ],
-    );
-  }
-}
-
-class PreviewButtons extends StatelessWidget {
-  const PreviewButtons(
-      {super.key, required this.onAccept, required this.onReject});
-
-  final void Function() onAccept;
-  final void Function() onReject;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 50,
-        ),
-        Row(
-          children: [
-            ElevatedButton.icon(
-              onPressed: onAccept,
-              label: const Text('Accept'),
-              icon: const Icon(Icons.save),
-            ),
-            SizedBox(
-              width: 50,
-            ),
-            ElevatedButton.icon(
-              onPressed: onReject,
-              label: const Text('Reject'),
-              icon: const Icon(Icons.delete_forever),
-            )
-          ],
-        ),
-      ],
     );
   }
 }
