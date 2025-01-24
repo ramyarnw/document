@@ -11,14 +11,11 @@ class FileViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const AppText('Preview:'),
-        if (image != null) Image.memory(image!),
-        const SizedBox(
-          height: 16,
-        ),
-      ],
-    );
+    if (image != null) {
+      return Image.memory(
+        image!,
+      );
+    }
+    return Container();
   }
 }

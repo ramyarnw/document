@@ -11,26 +11,21 @@ class PreviewButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        Expanded(child: SizedBox.shrink(),),
+        ElevatedButton.icon(
+          onPressed: onAccept,
+          label: const Text('Accept'),
+          icon: const Icon(Icons.save),
+        ),
         SizedBox(
-          width: 50,
+          width: 32,
         ),
-        Row(
-          children: [
-            ElevatedButton.icon(
-              onPressed: onAccept,
-              label: const Text('Accept'),
-              icon: const Icon(Icons.save),
-            ),
-            SizedBox(
-              width: 50,
-            ),
-            ElevatedButton.icon(
-              onPressed: onReject,
-              label: const Text('Reject'),
-              icon: const Icon(Icons.delete_forever),
-            )
-          ],
+        ElevatedButton.icon(
+          onPressed: onReject,
+          label: const Text('Reject'),
+          icon: const Icon(Icons.delete_forever),
         ),
+        Expanded(child: SizedBox.shrink(),),
       ],
     );
   }

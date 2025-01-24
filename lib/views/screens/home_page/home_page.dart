@@ -193,14 +193,18 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          if (showPreview)
+                          if (showPreview) ...[
                             FileViewer(
                               image: _image,
                             ),
-                          PreviewButtons(
-                            onAccept: onAccept,
-                            onReject: onReject,
-                          ),
+                            const SizedBox(
+                              height: 32,
+                            ),
+                            PreviewButtons(
+                              onAccept: onAccept,
+                              onReject: onReject,
+                            ),
+                          ],
                           if (showAIResponse) AIMetaData(),
                         ],
                       ),
