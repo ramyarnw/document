@@ -137,13 +137,9 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
     }
   }
   Future<void> onAccept() async {
-    setState(() {
-      isProcessing = true;
-    });
+    setLoading();
     await getAIImageToData(base64Image);
-    setState(() {
-      isProcessing = false;
-    });
+   resetLoading();
   }
 
 }

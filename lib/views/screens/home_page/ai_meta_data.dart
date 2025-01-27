@@ -19,11 +19,9 @@ class AIMetaData extends StatefulWidget {
     super.key,
     this.output,
     this.file,
-    this.imageData,
   });
 
   final String? output;
-  final Uint8List? imageData;
   final PlatformFile? file;
 
   @override
@@ -31,25 +29,12 @@ class AIMetaData extends StatefulWidget {
 }
 
 class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
-  Future<void> _createThread() async {
-    //final BuiltList<int> image = File(file?.path ?? '').readAsBytesSync().toBuiltList();
-    final BuiltList<int>? image = widget.imageData?.toBuiltList();
-    Thread thread = Thread(
-      (t) => t
-        ..id = ''
-        ..image = image?.toBuilder()
-        ..aiData = widget.output
-        ..fileName = widget.file?.name ?? '',
-    );
-    await createThread(thread: thread);
-  }
-
   bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    var showSave = widget.file != null;
+    //var showSave = widget.file != null;
     return Column(
       children: [
         if (widget.file != null) ...[
@@ -70,26 +55,26 @@ class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
         const SizedBox(
           height: 16,
         ),
-        if (showSave)
-          ElevatedButton(
-            onPressed: () async {
-              isLoading = true;
-              refresh();
-              await _createThread();
-              clearData();
-              isLoading = false;
-              refresh();
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomePage(),
-                ),
-              );
-            },
-            child: AppText(
-              'Save',
-            ),
-          ),
+        //if (showSave)
+          // ElevatedButton(
+          //   onPressed: () async {
+          //     isLoading = true;
+          //     refresh();
+          //     await _createThread();
+          //     clearData();
+          //     isLoading = false;
+          //     refresh();
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => HomePage(),
+          //       ),
+          //     );
+          //   },
+          //   child: AppText(
+          //     'Save',
+          //   ),
+          // ),
       ],
     );
   }

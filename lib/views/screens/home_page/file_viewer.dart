@@ -19,8 +19,13 @@ class _FileViewerState extends State<FileViewer>with StateMixin, ThreadMixin {
   @override
   Widget build(BuildContext context) {
     if (widget.image != null) {
-      return Image.memory(
-        widget.image!,
+      return SizedBox(
+        height: 600,
+        child: Center(
+          child: Image.memory(
+            widget.image!,
+          ),
+        ),
       );
     }
     return Container();
