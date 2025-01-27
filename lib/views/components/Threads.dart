@@ -95,7 +95,7 @@ class _ThreadTileState extends State<ThreadTile> with StateMixin, ThreadMixin {
             const SizedBox(
               width: 20,
             ),
-            Text('file name'),
+            Text(widget.thread.fileName),
             Spacer(),
             InkWell(
               onTap: () async {

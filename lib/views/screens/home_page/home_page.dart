@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 import '../../widgets/app_markdown.dart';
+import '../../widgets/app_texts.dart';
 import 'ai_meta_data.dart';
 import 'file_viewer.dart';
 
@@ -26,120 +27,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-
-  // Uint8List? _image;
-
-  // PlatformFile? file;
-  // bool isProcessing = false;
-  // String base64Image = '';
-  String? output;
-
-  // Future<void> pickFile() async {
-  //   setState(() {
-  //     isProcessing = true;
-  //   });
-  //   if (file == null) {
-  //     FilePickerResult? result = await FilePicker.platform.pickFiles(
-  //       allowMultiple: true,
-  //       type: FileType.custom,
-  //       allowedExtensions: [
-  //         'jpeg',
-  //         'pdf',
-  //       ],
-  //     );
-  //     if (result != null) {
-  //       file = result.files.first;
-  //       setState(() {});
-  //       if (file?.extension == 'pdf') {
-  //         if (file?.path != null) {
-  //           final document = await PdfDocument.openFile(file!.path!);
-  //
-  //           final page = await document.getPage(1);
-  //
-  //           final PdfPageImage? i = await page.render(
-  //             width: page.width * 2, //decrement for less quality
-  //             height: page.height * 2,
-  //             format: PdfPageImageFormat.jpeg,
-  //             backgroundColor: '#ffffff',
-  //           );
-  //           //_image = i?.bytes;
-  //           _image = (i?.bytes);
-  //           setState(() {});
-  //           //print(_image);
-  //         }
-  //       } else {
-  //         _image = File(file?.path ?? '').readAsBytesSync();
-  //         setState(() {});
-  //         // print(_image);
-  //       }
-  //     }
-  //     var imageBytes = _image?.map((e) => e).toList() ?? [];
-  //     base64Image = base64Encode(imageBytes);
-  //   }
-  //   setState(() {
-  //     isProcessing = false;
-  //   });
-  // }
-
-  void onReject() {
-    setState(() {
-      file = null;
-    });
-  }
-
-  Future<void> onAccept() async {
-    setState(() {
-      isProcessing = true;
-    });
-    await getAIImageToData(base64Image);
-    setState(() {
-      isProcessing = false;
-    });
-  }
-
-  Future<String?> getAIImageToData(String base64Image) async {
-    final response = await http.post(
-      Uri.parse('https://api.groq.com/openai/v1/chat/completions'),
-      headers: {
-        'Authorization':
-            'Bearer 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',
-      },
-      body: jsonEncode({
-        "messages": [
-          {
-            "role": "user",
-            "content": [
-              {
-                "type": "text",
-                "text":
-                    "Extract all the text from the provided image, including handwritten or printed text, numbers, and special characters. Return the content only in proper markdown format, without any additional explanations or identifiers.",
-              },
-              {
-                "type": "image_url",
-                "image_url": {"url": "data:image/jpeg;base64,$base64Image"}
-              }
-            ]
-          }
-        ],
-        "model": "llama-3.2-11b-vision-preview",
-        "temperature": 1,
-        "max_completion_tokens": 1024,
-        "top_p": 1,
-        "stream": false,
-        "stop": null
-      }),
-    );
-
-    var jsonDecode2 = jsonDecode(response.body);
-    List body = jsonDecode2["choices"];
-    var b = body;
-
-    for (var i in b) {
-      output = (output ?? '') + (i["message"]["content"]).toString();
-    }
-    print('Extracted data => $output');
-    return null;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -198,12 +85,35 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
                           if (showAIResponse)
                             AIMetaData(
                               output: output,
+                              imageData: image,
                               file: file,
                             )
                         ],
                       ),
                     ),
                   ),
+        // persistentFooterButtons: [
+        //   ElevatedButton(
+        //     onPressed: () async {
+        //       isLoading = true;
+        //       refresh();
+        //       await _createThread();
+        //       clearData();
+        //       isLoading = false;
+        //       refresh();
+        //       Navigator.push(
+        //         context,
+        //         MaterialPageRoute(
+        //           builder: (context) => HomePage(),
+        //         ),
+        //       );
+        //     },
+        //     child: AppText(
+        //       'Save',
+        //     ),
+        //   ),
+        //
+        // ],
       ),
     );
   }

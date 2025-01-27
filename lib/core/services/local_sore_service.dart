@@ -16,5 +16,7 @@ abstract class LocalStoreService extends AppService {
   Future<void> deleteThread({required String id});
 
   Future<void> clearThread();
+  Future<String?> getAIImageToData(String base64Image);
+
 
 }

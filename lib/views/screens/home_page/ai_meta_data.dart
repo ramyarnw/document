@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:built_collection/built_collection.dart';
 import 'package:document_scanner/views/screens/home_page/file_viewer.dart';
 import 'package:document_scanner/views/widgets/app_markdown.dart';
+import 'package:document_scanner/views/widgets/app_scaffold.dart';
 import 'package:document_scanner/views/widgets/extensions.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -16,9 +19,11 @@ class AIMetaData extends StatefulWidget {
     super.key,
     this.output,
     this.file,
+    this.imageData,
   });
 
   final String? output;
+  final Uint8List? imageData;
   final PlatformFile? file;
 
   @override
@@ -27,7 +32,8 @@ class AIMetaData extends StatefulWidget {
 
 class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
   Future<void> _createThread() async {
-    final BuiltList<int>? image = widget.file?.bytes?.toBuiltList();
+    //final BuiltList<int> image = File(file?.path ?? '').readAsBytesSync().toBuiltList();
+    final BuiltList<int>? image = widget.imageData?.toBuiltList();
     Thread thread = Thread(
       (t) => t
         ..id = ''
@@ -44,7 +50,6 @@ class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     var showSave = widget.file != null;
-    print('save => $showSave');
     return Column(
       children: [
         if (widget.file != null) ...[
@@ -60,27 +65,31 @@ class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
           height: size.height * 0.8,
           child: AppMarkdown(
             text: widget.output ?? '',
-            // text: widget.output ?? '',
           ),
         ),
         const SizedBox(
           height: 16,
         ),
-        if(showSave)
-        ElevatedButton(
-          onPressed: () async {
-            isLoading = true;
-            refresh();
-            await _createThread();
-            isLoading = false;
-            refresh();
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => HomePage()));
-          },
-          child: AppText(
-            'Save',
+        if (showSave)
+          ElevatedButton(
+            onPressed: () async {
+              isLoading = true;
+              refresh();
+              await _createThread();
+              clearData();
+              isLoading = false;
+              refresh();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomePage(),
+                ),
+              );
+            },
+            child: AppText(
+              'Save',
+            ),
           ),
-        ),
       ],
     );
   }

@@ -66,5 +66,10 @@ class AppViewModel extends AppStateNotifier<AppState>
   Future<void> clearThread() async {
     await localStoreService.clearThread();
   }
+  Future<String?> getAIImageToData(String base64Image) async
+  {
+    final String? imageData = await localStoreService.getAIImageToData(base64Image);
+    return imageData;
+  }
 
 }

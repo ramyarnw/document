@@ -8,13 +8,15 @@ import 'package:pdfx/pdfx.dart';
 
 import '../../ui.dart';
 import '../widgets/mixins.dart';
-bool isProcessing = false;
-PlatformFile? file;
-
-String base64Image = '';
-Uint8List? image;
 
 mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
+  String? output;
+  bool isProcessing = false;
+  PlatformFile? file;
+
+  String base64Image = '';
+  Uint8List? image;
+
   void listenThread() {
     try {
       context.appViewModel.listenThread();
@@ -34,7 +36,7 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
   Future<void> createThread({required Thread thread}) async {
     try {
       //var go = context.go;
-       await context.appViewModel.createThread(thread: thread);
+      await context.appViewModel.createThread(thread: thread);
       //go(TranscriptionPageRoute(chatId: id).location);
     } catch (e) {
       showSnack(e.toString());
@@ -67,6 +69,7 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
       showSnack(e.toString());
     }
   }
+
   Future<void> pickFile() async {
     setState(() {
       isProcessing = true;
@@ -95,20 +98,49 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
               format: PdfPageImageFormat.jpeg,
               backgroundColor: '#ffffff',
             );
-            //_image = i?.bytes;
-            image = (i?.bytes);
+            image = i?.bytes;
             setState(() {});
-            //print(_image);
           }
         } else {
           image = File(file?.path ?? '').readAsBytesSync();
           setState(() {});
-          // print(_image);
         }
       }
       var imageBytes = image?.map((e) => e).toList() ?? [];
       base64Image = base64Encode(imageBytes);
     }
+    setState(() {
+      isProcessing = false;
+    });
+  }
+
+  void onReject() {
+    setState(() {
+      file = null;
+    });
+  }
+
+  void clearData() {
+    output = '';
+    isProcessing = false;
+    file = null;
+    base64Image = '';
+    image = null;
+  }
+
+  Future<void> getAIImageToData(String base64Image) async {
+    try {
+      output=  await context.appViewModel.getAIImageToData(base64Image);
+      showSnack('AI data extracted');
+    } catch (e) {
+      showSnack(e.toString());
+    }
+  }
+  Future<void> onAccept() async {
+    setState(() {
+      isProcessing = true;
+    });
+    await getAIImageToData(base64Image);
     setState(() {
       isProcessing = false;
     });
