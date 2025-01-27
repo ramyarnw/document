@@ -154,7 +154,9 @@ class ThreadBuilder implements Builder<Thread, ThreadBuilder> {
   String? get fileName => _$this._fileName;
   set fileName(String? fileName) => _$this._fileName = fileName;
 
-  ThreadBuilder();
+  ThreadBuilder() {
+    Thread._initializeBuilder(this);
+  }
 
   ThreadBuilder get _$this {
     final $v = _$v;
