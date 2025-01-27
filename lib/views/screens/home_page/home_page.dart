@@ -172,39 +172,40 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
                 pickFile: pickFile,
               )
             : null,
-        body:  showThread
-                ? Threads()
-                : showProgressIndicator
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              if (showPreview) ...[
-                                FileViewer(
-                                  image: image,
-                                ),
-                                const SizedBox(
-                                  height: 32,
-                                ),
-                                PreviewButtons(
-                                  onAccept: onAccept,
-                                  onReject: onReject,
-                                ),
-                              ],
-                              if (showAIResponse)
-                                AIMetaData(
-                                  output: output,
-                                ),
-                            ],
-                          ),
-                        ),
+        body: showThread
+            ? Threads()
+            : showProgressIndicator
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          if (showPreview) ...[
+                            FileViewer(
+                              image: image,
+                            ),
+                            const SizedBox(
+                              height: 32,
+                            ),
+                            PreviewButtons(
+                              onAccept: onAccept,
+                              onReject: onReject,
+                            ),
+                          ],
+                          if (showAIResponse)
+                            AIMetaData(
+                              output: output,
+
+                            )
+                        ],
                       ),
+                    ),
+                  ),
       ),
     );
   }

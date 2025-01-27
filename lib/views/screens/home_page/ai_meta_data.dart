@@ -1,5 +1,7 @@
 import 'package:built_collection/built_collection.dart';
+import 'package:document_scanner/views/screens/home_page/file_viewer.dart';
 import 'package:document_scanner/views/widgets/app_markdown.dart';
+import 'package:document_scanner/views/widgets/extensions.dart';
 import 'package:file_picker/file_picker.dart';
 
 import '../../../model/thread.dart';
@@ -40,11 +42,24 @@ class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Column(
       children: [
-        AppMarkdown(
-          text: widget.output ?? '',
-          // text: widget.output ?? '',
+        if (widget.file != null) ...[
+          FileViewer(
+            image: widget.file?.bytes,
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+        ],
+        SizedBox(
+          width: size.width,
+          height: size.height * 0.8,
+          child: AppMarkdown(
+            text: widget.output ?? '',
+            // text: widget.output ?? '',
+          ),
         ),
         const SizedBox(
           height: 16,
