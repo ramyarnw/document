@@ -43,6 +43,8 @@ class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    var showSave = widget.file != null;
+    print('save => $showSave');
     return Column(
       children: [
         if (widget.file != null) ...[
@@ -64,6 +66,7 @@ class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
         const SizedBox(
           height: 16,
         ),
+        if(showSave)
         ElevatedButton(
           onPressed: () async {
             isLoading = true;

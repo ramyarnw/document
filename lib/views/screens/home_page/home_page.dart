@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:built_collection/built_collection.dart';
-import 'package:document_scanner/provider/provider_utils.dart';
 import 'package:document_scanner/views/components/Threads.dart';
 import 'package:document_scanner/views/mixin/threadMixin.dart';
 import 'package:document_scanner/views/screens/home_page/pick_file_widget.dart';
@@ -200,7 +198,7 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
                           if (showAIResponse)
                             AIMetaData(
                               output: output,
-
+                              file: file,
                             )
                         ],
                       ),
