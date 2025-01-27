@@ -44,7 +44,7 @@ class _ThreadsState extends State<Threads> with StateMixin, ThreadMixin {
       ),
       body: loading
           ? const Center(
-              child: AppProgressIndicator(),
+              child: AppProgressIndicator(size: 12,color: Colors.white, width: 12,),
             )
           : Container(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 16),

@@ -92,7 +92,7 @@ mixin FutureStateMixin<S extends StatefulWidget, T> on State<S> {
   }
 
   Widget progressBuilder(BuildContext context) {
-    return const AppProgressIndicator();
+    return const AppProgressIndicator(size: 12,color: Colors.white, width: 12,);
   }
 
   Widget dataBuilder(BuildContext context, T? data) {
@@ -149,7 +149,7 @@ mixin StreamStateMixin<S extends StatefulWidget, T> on State<S> {
   }
 
   Widget progressBuilder(BuildContext context) {
-    return const AppProgressIndicator();
+    return const AppProgressIndicator(size: 12,color: Colors.white, width: 12,);
   }
 
   Widget dataBuilder(BuildContext context, T? data) {

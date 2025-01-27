@@ -43,7 +43,7 @@ class AppImage extends StatelessWidget {
         imageUrl: url!,
         fit: BoxFit.cover,
         placeholder: (_, __) {
-          return const AppProgressIndicator();
+          return const AppProgressIndicator(size: 12,color: Colors.white, width: 12,);
         },
       );
     }

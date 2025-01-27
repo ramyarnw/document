@@ -1,4 +1,7 @@
 import '../../../ui.dart';
+import '../../widgets/app_icon.dart';
+import '../../widgets/app_progress_indicator.dart';
+import '../../widgets/app_texts.dart';
 
 class PreviewButtons extends StatelessWidget {
   const PreviewButtons(
@@ -19,9 +22,9 @@ class PreviewButtons extends StatelessWidget {
             backgroundColor: Colors.purple
           ),
           onPressed: isProcessing?null:onAccept,
-          label: isProcessing?CircularProgressIndicator():
-          const Text('Accept'),
-          icon: const Icon(Icons.save),
+          label: isProcessing?AppProgressIndicator(size: 12,color: Colors.white, width: 12,):
+          const AppText('Accept'),
+          icon: const AppIcon(Icons.save),
         ),
         SizedBox(
           width: 32,
@@ -31,8 +34,8 @@ class PreviewButtons extends StatelessWidget {
               backgroundColor: Colors.purple
           ),
           onPressed: onReject,
-          label:const Text('Reject'),
-          icon: const Icon(Icons.delete_forever),
+          label:const AppText('Reject'),
+          icon: const AppIcon(Icons.delete_forever),
         ),
         Expanded(child: SizedBox.shrink(),),
       ],
