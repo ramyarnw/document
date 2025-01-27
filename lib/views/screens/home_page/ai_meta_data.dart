@@ -1,12 +1,10 @@
 import 'package:built_collection/built_collection.dart';
-import 'package:document_scanner/views/navigation/app_routes.dart';
-import 'package:document_scanner/views/navigation/router_utils.dart';
+import 'package:document_scanner/views/widgets/app_markdown.dart';
 import 'package:file_picker/file_picker.dart';
 
 import '../../../model/thread.dart';
 import '../../../ui.dart';
 import '../../mixin/threadMixin.dart';
-import '../../widgets/app_markdown.dart';
 import '../../widgets/app_texts.dart';
 import '../../widgets/mixins.dart';
 import 'home_page.dart';
@@ -32,7 +30,8 @@ class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
       (t) => t
         ..id = ''
         ..image = image?.toBuilder()
-        ..aiData = widget.output,
+        ..aiData = widget.output
+        ..fileName = widget.file?.name ?? '',
     );
     await createThread(thread: thread);
   }
@@ -43,8 +42,9 @@ class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
-          widget.output ?? '',
+        AppMarkdown(
+          text: widget.output ?? '',
+          // text: widget.output ?? '',
         ),
         const SizedBox(
           height: 16,

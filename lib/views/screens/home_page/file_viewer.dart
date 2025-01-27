@@ -1,7 +1,9 @@
-import '../../../ui.dart';
-import '../../widgets/app_texts.dart';
+import 'package:document_scanner/views/mixin/threadMixin.dart';
+import 'package:document_scanner/views/widgets/mixins.dart';
 
-class FileViewer extends StatelessWidget {
+import '../../../ui.dart';
+
+class FileViewer extends StatefulWidget {
   const FileViewer({
     super.key,
     this.image,
@@ -10,10 +12,15 @@ class FileViewer extends StatelessWidget {
   final Uint8List? image;
 
   @override
+  State<FileViewer> createState() => _FileViewerState();
+}
+
+class _FileViewerState extends State<FileViewer>with StateMixin, ThreadMixin {
+  @override
   Widget build(BuildContext context) {
-    if (image != null) {
+    if (widget.image != null) {
       return Image.memory(
-        image!,
+        widget.image!,
       );
     }
     return Container();

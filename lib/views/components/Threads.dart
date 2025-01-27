@@ -82,7 +82,6 @@ class ThreadTile extends StatefulWidget {
 class _ThreadTileState extends State<ThreadTile> with StateMixin, ThreadMixin {
   @override
   Widget build(BuildContext context) {
-    PlatformFile? file;
 
     return SizedBox(
       width: 40,

@@ -27,6 +27,9 @@ class _$ThreadSerializer implements StructuredSerializer<Thread> {
       'aiData',
       serializers.serialize(object.aiData,
           specifiedType: const FullType(String)),
+      'fileName',
+      serializers.serialize(object.fileName,
+          specifiedType: const FullType(String)),
     ];
 
     return result;
@@ -57,6 +60,10 @@ class _$ThreadSerializer implements StructuredSerializer<Thread> {
           result.aiData = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
+        case 'fileName':
+          result.fileName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
       }
     }
 
@@ -71,15 +78,22 @@ class _$Thread extends Thread {
   final BuiltList<int> image;
   @override
   final String aiData;
+  @override
+  final String fileName;
 
   factory _$Thread([void Function(ThreadBuilder)? updates]) =>
       (new ThreadBuilder()..update(updates))._build();
 
-  _$Thread._({required this.id, required this.image, required this.aiData})
+  _$Thread._(
+      {required this.id,
+      required this.image,
+      required this.aiData,
+      required this.fileName})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(id, r'Thread', 'id');
     BuiltValueNullFieldError.checkNotNull(image, r'Thread', 'image');
     BuiltValueNullFieldError.checkNotNull(aiData, r'Thread', 'aiData');
+    BuiltValueNullFieldError.checkNotNull(fileName, r'Thread', 'fileName');
   }
 
   @override
@@ -95,7 +109,8 @@ class _$Thread extends Thread {
     return other is Thread &&
         id == other.id &&
         image == other.image &&
-        aiData == other.aiData;
+        aiData == other.aiData &&
+        fileName == other.fileName;
   }
 
   @override
@@ -104,6 +119,7 @@ class _$Thread extends Thread {
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, image.hashCode);
     _$hash = $jc(_$hash, aiData.hashCode);
+    _$hash = $jc(_$hash, fileName.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -113,7 +129,8 @@ class _$Thread extends Thread {
     return (newBuiltValueToStringHelper(r'Thread')
           ..add('id', id)
           ..add('image', image)
-          ..add('aiData', aiData))
+          ..add('aiData', aiData)
+          ..add('fileName', fileName))
         .toString();
   }
 }
@@ -133,6 +150,10 @@ class ThreadBuilder implements Builder<Thread, ThreadBuilder> {
   String? get aiData => _$this._aiData;
   set aiData(String? aiData) => _$this._aiData = aiData;
 
+  String? _fileName;
+  String? get fileName => _$this._fileName;
+  set fileName(String? fileName) => _$this._fileName = fileName;
+
   ThreadBuilder();
 
   ThreadBuilder get _$this {
@@ -141,6 +162,7 @@ class ThreadBuilder implements Builder<Thread, ThreadBuilder> {
       _id = $v.id;
       _image = $v.image.toBuilder();
       _aiData = $v.aiData;
+      _fileName = $v.fileName;
       _$v = null;
     }
     return this;
@@ -169,6 +191,8 @@ class ThreadBuilder implements Builder<Thread, ThreadBuilder> {
             image: image.build(),
             aiData: BuiltValueNullFieldError.checkNotNull(
                 aiData, r'Thread', 'aiData'),
+            fileName: BuiltValueNullFieldError.checkNotNull(
+                fileName, r'Thread', 'fileName'),
           );
     } catch (_) {
       late String _$failedField;

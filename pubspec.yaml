@@ -33,6 +33,7 @@ dependencies:
   file_picker: ^8.1.7
   pdfx: ^2.8.0
   flutter_markdown: ^0.7.5
+#  markdown_viewer: ^0.6.2
   #  pdf_to_image_converter: ^0.0.3
   http: ^1.2.2
   build_runner: ^2.4.13

@@ -1,3 +1,4 @@
+
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 import '../../ui.dart';
@@ -13,7 +14,7 @@ class AppMarkdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Markdown(
-      data: text,
+      data:text,
     );
   }
 }
