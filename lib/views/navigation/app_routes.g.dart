@@ -15,12 +15,8 @@ RouteBase get $homePageRoute => GoRouteData.$route(
       factory: $HomePageRouteExtension._fromState,
       routes: [
         GoRouteData.$route(
-          path: 'profile/:id',
-          factory: $ProfilePageRouteExtension._fromState,
-        ),
-        GoRouteData.$route(
-          path: 'terms',
-          factory: $TermsPageRouteExtension._fromState,
+          path: 'thread',
+          factory: $ThreadPageRouteExtension._fromState,
         ),
       ],
     );
@@ -42,30 +38,16 @@ extension $HomePageRouteExtension on HomePageRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $ProfilePageRouteExtension on ProfilePageRoute {
-  static ProfilePageRoute _fromState(GoRouterState state) => ProfilePageRoute(
-        id: int.parse(state.pathParameters['id']!),
+extension $ThreadPageRouteExtension on ThreadPageRoute {
+  static ThreadPageRoute _fromState(GoRouterState state) => ThreadPageRoute(
+        threadId: state.uri.queryParameters['thread-id']!,
       );
 
   String get location => GoRouteData.$location(
-        '/profile/${Uri.encodeComponent(id.toString())}',
-      );
-
-  void go(BuildContext context) => context.go(location);
-
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
-
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
-
-  void replace(BuildContext context) => context.replace(location);
-}
-
-extension $TermsPageRouteExtension on TermsPageRoute {
-  static TermsPageRoute _fromState(GoRouterState state) => TermsPageRoute();
-
-  String get location => GoRouteData.$location(
-        '/terms',
+        '/thread',
+        queryParams: {
+          'thread-id': threadId,
+        },
       );
 
   void go(BuildContext context) => context.go(location);

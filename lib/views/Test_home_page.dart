@@ -49,7 +49,8 @@ class _TestHomePageState extends State<TestHomePage> with AppProviderMixin<TestH
             child: const AppIcon(Icons.add),
           ),
           FloatingActionButton(
-            onPressed: () => context.go(const ProfilePageRoute(id: 1).location),
+            onPressed:(){},
+                //() => context.go(const ProfilePageRoute(id: 1).location),
             tooltip: 'Profile Page',
             child: const AppIcon(Icons.arrow_forward),
           ),

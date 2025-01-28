@@ -8,12 +8,15 @@ import '../../ui.dart' hide RouterUtils;
 import '../Test_home_page.dart';
 import '../profile_page.dart';
 import '../screens/home_page/home_page.dart';
+import '../screens/thread_page.dart';
 import '../terms_page.dart';
 
 part 'app_routes.g.dart';
 
+
 RouterConfig<Object> appRouter() {
   return GoRouter(
+    initialLocation: '/',
     routes: $appRoutes,
     redirect: (BuildContext c, GoRouterState s) {
       return null;
@@ -80,12 +83,10 @@ abstract class UnauthenticatedRouteData extends AppRouterData {
 @TypedGoRoute<HomePageRoute>(
   path: '/',
   routes: <TypedRoute<RouteData>>[
-    TypedGoRoute<ProfilePageRoute>(
-      path: 'profile/:id',
+    TypedGoRoute<ThreadPageRoute>(
+      path: 'thread',
     ),
-    TypedGoRoute<TermsPageRoute>(
-      path: 'terms',
-    ),
+
   ],
 )
 @immutable
@@ -95,6 +96,22 @@ class HomePageRoute extends AuthenticatedRouteData {
     return const HomePage();
   }
 }
+@immutable
+class ThreadPageRoute extends AuthenticatedRouteData {
+  const ThreadPageRoute({
+    required this.threadId,
+  });
+
+  final String threadId;
+
+  @override
+  Widget buildWidget(BuildContext context, GoRouterState state) {
+    return ThreadPage(
+      id: threadId,
+    );
+  }
+}
+
 
 @immutable
 class ProfilePageRoute extends AuthenticatedRouteData {
