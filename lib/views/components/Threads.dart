@@ -49,7 +49,11 @@ class _ThreadsState extends State<Threads> with StateMixin, ThreadMixin {
       ),
       body: loading
           ? const Center(
-              child: AppProgressIndicator(size: 12,color: Colors.white, width: 12,),
+              child: AppProgressIndicator(
+                size: 12,
+                color: Colors.white,
+                width: 12,
+              ),
             )
           : Container(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 16),
@@ -87,7 +91,6 @@ class ThreadTile extends StatefulWidget {
 class _ThreadTileState extends State<ThreadTile> with StateMixin, ThreadMixin {
   @override
   Widget build(BuildContext context) {
-
     return SizedBox(
       width: 40,
       height: 40,
@@ -100,7 +103,7 @@ class _ThreadTileState extends State<ThreadTile> with StateMixin, ThreadMixin {
             const SizedBox(
               width: 20,
             ),
-            AppTitle(widget.thread.fileName),
+            AppTitle(widget.thread.fileName ?? ''),
             Spacer(),
             InkWell(
               onTap: () async {
@@ -113,7 +116,6 @@ class _ThreadTileState extends State<ThreadTile> with StateMixin, ThreadMixin {
                     );
                   },
                 );
-                //await removeThread();
               },
               child: AppIcon(icons.delete),
             ),
@@ -121,7 +123,6 @@ class _ThreadTileState extends State<ThreadTile> with StateMixin, ThreadMixin {
         ),
         onTap: () {
           context.push(ThreadPageRoute(threadId: widget.thread.id).location);
-
         },
       ),
     );

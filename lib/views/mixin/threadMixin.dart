@@ -71,6 +71,7 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
   }
 
   Future<void> pickFile() async {
+    // List<int>? fileBytes;
     setState(() {
       isProcessing = true;
     });
@@ -84,29 +85,38 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
         ],
       );
       if (result != null) {
+        // int fileLength = result.files.length ?? 0;
+        //for (int i = 0; i < fileLength; i++) {
         file = result.files.first;
         setState(() {});
+        // file = result.files.singleOrNull;
         if (file?.extension == 'pdf') {
           if (file?.path != null) {
             final document = await PdfDocument.openFile(file!.path!);
-
-            final page = await document.getPage(1);
-
-            final PdfPageImage? i = await page.render(
-              width: page.width * 2, //decrement for less quality
-              height: page.height * 2,
-              format: PdfPageImageFormat.jpeg,
-              backgroundColor: '#ffffff',
-            );
-            image = i?.bytes;
+            image = File(document.toString()).readAsBytesSync();
             setState(() {});
+            //   int fileLength = result.files.length ?? 0;
+            //   for (int i = 0; i < fileLength; i++) {
+            // final page = await document.getPage(1);
+            //
+            //   final PdfPageImage? i = await page.render(
+            //     width: page.width * 2, //decrement for less quality
+            //     height: page.height * 2,
+            //     format: PdfPageImageFormat.jpeg,
+            //     backgroundColor: '#ffffff',
+            //   );
+            //   image = i?.bytes;
+            //   setState(() {});
+            // }
           }
         } else {
           image = File(file?.path ?? '').readAsBytesSync();
           setState(() {});
         }
+        //fileBytes = (image!.toList() + fileBytes!);
+        //}
       }
-      var imageBytes = image?.map((e) => e).toList() ?? [];
+      List<int> imageBytes = image?.map((e) => e).toList() ?? [];
       base64Image = base64Encode(imageBytes);
     }
     setState(() {
@@ -130,16 +140,16 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
 
   Future<void> getAIImageToData(String base64Image) async {
     try {
-      output=  await context.appViewModel.getAIImageToData(base64Image);
+      output = await context.appViewModel.getAIImageToData(base64Image);
       showSnack('AI data extracted');
     } catch (e) {
       showSnack(e.toString());
     }
   }
+
   Future<void> onAccept() async {
     setLoading();
     await getAIImageToData(base64Image);
-   resetLoading();
+    resetLoading();
   }
-
 }

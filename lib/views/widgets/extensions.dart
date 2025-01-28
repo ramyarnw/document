@@ -137,7 +137,7 @@ extension BuildContextUtils on BuildContext {
 
   ThemeData get theme => Theme.of(this);
 
-  AppTheme get appTheme => Theme.of(this).extension<AppTheme>()!;
+  AppTheme get appTheme => Theme.of(this).extension<AppTheme>() ?? AppDarkTheme();
 
   bool get isDarkTheme => theme.brightness == Brightness.dark;
 
