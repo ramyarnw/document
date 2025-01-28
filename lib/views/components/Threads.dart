@@ -1,5 +1,6 @@
 import 'package:built_collection/src/list.dart';
 import 'package:document_scanner/provider/provider_utils.dart';
+import 'package:document_scanner/utils/extensions.dart';
 import 'package:document_scanner/views/mixin/threadMixin.dart';
 import 'package:document_scanner/views/screens/thread_page.dart';
 import 'package:file_picker/file_picker.dart';
@@ -7,6 +8,7 @@ import 'package:file_picker/file_picker.dart';
 import '../../model/thread.dart';
 import '../../ui.dart';
 import '../widgets/app_bar.dart';
+import '../widgets/app_icon.dart';
 import '../widgets/app_progress_indicator.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/app_texts.dart';
@@ -90,8 +92,8 @@ class _ThreadTileState extends State<ThreadTile> with StateMixin, ThreadMixin {
       child: InkWell(
         child: Row(
           children: [
-            Icon(
-              Icons.file_open,
+            AppIcon(
+              icons.file,
             ),
             const SizedBox(
               width: 20,
@@ -111,7 +113,7 @@ class _ThreadTileState extends State<ThreadTile> with StateMixin, ThreadMixin {
                 );
                 //await removeThread();
               },
-              child: Icon(Icons.delete),
+              child: AppIcon(icons.delete),
             ),
           ],
         ),

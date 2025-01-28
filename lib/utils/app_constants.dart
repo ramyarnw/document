@@ -9,5 +9,8 @@ abstract class AppColors {
   final Color lightYellow = const Color(0xFFFFF5C9);
   final Color green = const Color(0xFF009688);
   final Color white = const Color(0xFFF3EFEF);
+  final Color onPrimaryColor = const Color(0xFF591DA9);
+
+
 
 }
