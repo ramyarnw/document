@@ -9,6 +9,7 @@ import '../../ui.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/app_progress_indicator.dart';
 import '../widgets/app_scaffold.dart';
+import '../widgets/app_texts.dart';
 import '../widgets/mixins.dart';
 
 class Threads extends StatefulWidget {
@@ -38,7 +39,7 @@ class _ThreadsState extends State<Threads> with StateMixin, ThreadMixin {
     final BuiltList<Thread> threads = context.appState.threads;
     return AppScaffold(
       appBar: ApplicationAppBar(
-        title: Text(
+        title: AppBoldTitle(
           'Threads',
         ),
       ),
@@ -50,7 +51,7 @@ class _ThreadsState extends State<Threads> with StateMixin, ThreadMixin {
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 16),
               child: threads.isEmpty
                   ? const Center(
-                      child: Text('No Threads'),
+                      child: AppSubtitle('No Threads'),
                     )
                   : ListView.builder(
                       physics: NeverScrollableScrollPhysics(),
@@ -95,7 +96,7 @@ class _ThreadTileState extends State<ThreadTile> with StateMixin, ThreadMixin {
             const SizedBox(
               width: 20,
             ),
-            Text(widget.thread.fileName),
+            AppTitle(widget.thread.fileName),
             Spacer(),
             InkWell(
               onTap: () async {
@@ -139,11 +140,8 @@ class DeleteAlertBox extends StatelessWidget {
     return AlertDialog(
       title: Column(
         children: [
-          Text(
+          AppTitle(
             'Are you Sure Want To Delete The File',
-            style: TextStyle(
-              fontSize: 12,
-            ),
           ),
           Row(
             children: [
@@ -152,12 +150,12 @@ class DeleteAlertBox extends StatelessWidget {
                     deleteThread(id: id);
                     Navigator.pop(context);
                   },
-                  child: Text('Delete')),
+                  child: AppSubtitle('Delete')),
               ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: Text('Cancel')),
+                  child: AppSubtitle('Cancel')),
             ],
           ),
         ],

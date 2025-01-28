@@ -1,6 +1,8 @@
+import 'package:document_scanner/utils/extensions.dart';
 import 'package:flutter/material.dart';
 
 import '../../ui.dart';
+import 'app_typography.dart';
 
 ThemeData getTheme({bool isDarkMode = false}) {
   final AppTheme appLightTheme = isDarkMode ? AppDarkTheme() : AppLightTheme();
@@ -32,6 +34,12 @@ abstract class AppTheme extends ThemeExtension<AppTheme> {
   @override
   ThemeExtension<AppTheme> lerp(ThemeExtension<AppTheme>? other, double t) {
     return this;
+  }
+  AppTypography? _appTypography;
+
+  AppTypography get appTypography {
+    _appTypography ??= AppTypography(colors);
+    return _appTypography!;
   }
 
   Color get primaryColor => Colors.red;

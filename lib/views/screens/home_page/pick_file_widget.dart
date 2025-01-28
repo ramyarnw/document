@@ -1,4 +1,6 @@
 import '../../../ui.dart';
+import '../../widgets/app_icon.dart';
+import '../../widgets/app_texts.dart';
 
 class PickFileWidget extends StatelessWidget {
   const PickFileWidget({
@@ -13,11 +15,12 @@ class PickFileWidget extends StatelessWidget {
     return SizedBox(
       width: 120,
       child: FloatingActionButton.extended(
-          onPressed: () {
-            pickFile();
-          },
-          label: Text('Pick files'),
-          icon: const Icon(Icons.description)),
+        onPressed: () {
+          pickFile();
+        },
+        label: AppBoldTitle('Pick files'),
+        icon: const AppIcon(Icons.description),
+      ),
     );
   }
 }

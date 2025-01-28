@@ -1,19 +1,15 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:built_collection/built_collection.dart';
 import 'package:document_scanner/views/components/Threads.dart';
 import 'package:document_scanner/views/mixin/threadMixin.dart';
 import 'package:document_scanner/views/screens/home_page/pick_file_widget.dart';
 import 'package:document_scanner/views/screens/home_page/preview_buttons.dart';
+import 'package:document_scanner/views/widgets/app_bar.dart';
 import 'package:document_scanner/views/widgets/mixins.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 
 import '../../../model/thread.dart';
-import '../../widgets/app_markdown.dart';
+import '../../widgets/app_progress_indicator.dart';
+import '../../widgets/app_scaffold.dart';
 import '../../widgets/app_texts.dart';
 import 'ai_meta_data.dart';
 import 'file_viewer.dart';
@@ -32,7 +28,6 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
   final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
   Future<void> _createThread() async {
-    //final BuiltList<int> image = File(file?.path ?? '').readAsBytesSync().toBuiltList();
     final BuiltList<int>? i = image?.toBuiltList();
     Thread thread = Thread(
       (t) => t
@@ -50,10 +45,10 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
   Widget build(BuildContext context) {
     bool showFilePicker = file == null && !isProcessing;
     bool showPreview = file != null && output == null && !isProcessing;
-    bool showProgressIndicator = isProcessing;
-    bool showAIResponse = output != null;
-
+    bool showSaveButton = output != null;
+    bool showAIResponse = showSaveButton;
     bool showThread = file == null;
+    bool showPreviewButton = (image != null) && (!isProcessing) && (output == null);
     return MaterialApp(
       scaffoldMessengerKey: _scaffoldMessengerKey,
       themeMode: ThemeMode.dark,
@@ -65,10 +60,10 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
         ),
       ),
       home: ScaffoldMessenger(
-        child: Scaffold(
+        child: AppScaffold(
           key: _scaffoldKey,
-          appBar: AppBar(
-            title: const Text('Document Scanner '),
+          appBar: ApplicationAppBar(
+            title: const AppBoldHeader('Document Scanner '),
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
           floatingActionButton: showFilePicker
@@ -96,15 +91,14 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
                         if (showAIResponse)
                           AIMetaData(
                             output: output,
-                            //imageData: image,
                             file: file,
-                          )
+                          ),
                       ],
                     ),
                   ),
                 ),
           persistentFooterButtons: [
-            if (output != null)
+            if (showSaveButton)
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
                 onPressed: () async {
@@ -122,15 +116,15 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
                   );
                 },
                 child: isLoading
-                    ? CircularProgressIndicator()
+                    ? AppProgressIndicator(size: 12,color: Colors.white, width: 2,)
                     : Center(
                         child: AppText(
                           'Save',
                         ),
                       ),
               ),
-            if ((image != null) && (!isProcessing) && (output == null))
-              PreviewButtons(onAccept: onAccept, onReject: onReject, isProcessing: loading,)
+            if (showPreviewButton)
+              PreviewButtons(onAccept: onAccept, onReject: onReject, isProcessing: loading,),
           ],
         ),
       ),

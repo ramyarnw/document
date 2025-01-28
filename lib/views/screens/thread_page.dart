@@ -6,6 +6,7 @@ import 'package:document_scanner/views/widgets/mixins.dart';
 
 import '../../model/thread.dart';
 import '../../ui.dart';
+import '../widgets/app_bar.dart';
 import 'home_page/ai_meta_data.dart';
 import 'home_page/file_viewer.dart';
 
@@ -27,16 +28,15 @@ class _ThreadPageState extends State<ThreadPage> with StateMixin, ThreadMixin {
     Thread? thread = context.appState.getThreadById(widget.id);
     final Uint8List _image = Uint8List.fromList(thread?.image.toList() ?? []);
     print('Preview img: $_image');
-
     Size size = MediaQuery.of(context).size;
     double width = size.width;
     double height = size.height;
     return AppScaffold(
-      appBar: AppBar(
+      appBar: ApplicationAppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            AppText(thread?.fileName ?? 'Preview'),
+            AppHeader(thread?.fileName ?? 'Preview'),
           ],
         ),
       ),

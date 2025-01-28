@@ -24,6 +24,157 @@ class AppText extends StatelessWidget {
     );
   }
 }
+class AppHeader extends StatelessWidget {
+  const AppHeader(
+      this.text, {
+        super.key,
+        TextStyle? style,
+      }) : _style = style;
+  final String text;
+  final TextStyle? _style;
+
+  TextStyle? getStyle(BuildContext context) {
+    return _style ?? context.appTheme.appTypography.appHeader;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: getStyle(context),
+    );
+  }
+}
+class AppBoldHeader extends StatelessWidget {
+  const AppBoldHeader(
+      this.text, {
+        super.key,
+        TextStyle? style,
+      }) : _style = style;
+  final String text;
+  final TextStyle? _style;
+
+  TextStyle? getStyle(BuildContext context) {
+    return _style ?? context.appTheme.appTypography.appBoldHeader;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: getStyle(context),
+    );
+  }
+}
+
+class AppTitle extends StatelessWidget {
+  const AppTitle(
+      this.text, {
+        super.key,
+        TextStyle? style,
+      }) : _style = style;
+  final String text;
+  final TextStyle? _style;
+
+  TextStyle? getStyle(BuildContext context) {
+    return context.appTheme.appTypography.appTitle;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: getStyle(context),
+    );
+  }
+}
+
+class AppBoldTitle extends StatelessWidget {
+  const AppBoldTitle(
+      this.text, {
+        super.key,
+        TextStyle? style,
+      }) : _style = style;
+  final String text;
+  final TextStyle? _style;
+
+  TextStyle? getStyle(BuildContext context) {
+    return _style ?? context.appTheme.appTypography.appBoldTitle;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: getStyle(context),
+    );
+  }
+}
+
+class AppSubtitle extends StatelessWidget {
+  const AppSubtitle(
+      this.text, {
+        super.key,
+        TextStyle? style,
+      }) : _style = style;
+  final String text;
+  final TextStyle? _style;
+
+  TextStyle? getStyle(BuildContext context) {
+    return _style ?? context.appTheme.appTypography.appSubTitle;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: getStyle(context),
+    );
+  }
+}
+
+class AppBody extends StatelessWidget {
+  const AppBody(
+      this.text, {
+        super.key,
+        TextStyle? style,
+      }) : _style = style;
+  final String text;
+  final TextStyle? _style;
+
+  TextStyle? getStyle(BuildContext context) {
+    return _style;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: getStyle(context),
+    );
+  }
+}
+
+class AppBoldBody extends StatelessWidget {
+  const AppBoldBody(
+      this.text, {
+        super.key,
+        TextStyle? style,
+      }) : _style = style;
+  final String text;
+  final TextStyle? _style;
+
+  TextStyle? getStyle(BuildContext context) {
+    return _style;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
+
+
 
 class DisplayLarge extends AppText {
   const DisplayLarge(super.text, {super.key});
