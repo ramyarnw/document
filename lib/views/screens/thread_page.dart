@@ -47,7 +47,7 @@ class _ThreadPageState extends State<ThreadPage> with StateMixin, ThreadMixin {
           child: Column(
             children: [
               FileViewer(
-                image: _image,
+                imageList: _image,
               ),
               AIMetaData(
                 output: thread?.aiData,

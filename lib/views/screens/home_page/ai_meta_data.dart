@@ -30,7 +30,7 @@ class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
       children: [
         if (widget.file != null) ...[
           FileViewer(
-            image: widget.file?.bytes,
+            imageList: widget.file?.bytes, imagePath: widget.file.path,
           ),
           const SizedBox(
             height: 16,

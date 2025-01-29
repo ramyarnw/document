@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:built_collection/built_collection.dart';
 import 'package:document_scanner/model/thread.dart';
 import 'package:document_scanner/provider/provider_utils.dart';
 import 'package:file_picker/file_picker.dart';
@@ -15,7 +16,9 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
   PlatformFile? file;
 
   String base64Image = '';
-  Uint8List? image;
+  //Uint8List? image;
+  List<String> imageList = [];
+  String? imagePath;
 
   void listenThread() {
     try {
@@ -71,7 +74,6 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
   }
 
   Future<void> pickFile() async {
-    // List<int>? fileBytes;
     setState(() {
       isProcessing = true;
     });
@@ -85,45 +87,61 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
         ],
       );
       if (result != null) {
-        // int fileLength = result.files.length ?? 0;
-        //for (int i = 0; i < fileLength; i++) {
         file = result.files.first;
         setState(() {});
-        // file = result.files.singleOrNull;
         if (file?.extension == 'pdf') {
           if (file?.path != null) {
             final document = await PdfDocument.openFile(file!.path!);
-            image = File(document.toString()).readAsBytesSync();
-            setState(() {});
-            //   int fileLength = result.files.length ?? 0;
-            //   for (int i = 0; i < fileLength; i++) {
-            // final page = await document.getPage(1);
+            final int pages = document.pagesCount;
+            print('page count => $pages');
             //
-            //   final PdfPageImage? i = await page.render(
-            //     width: page.width * 2, //decrement for less quality
-            //     height: page.height * 2,
-            //     format: PdfPageImageFormat.jpeg,
-            //     backgroundColor: '#ffffff',
-            //   );
-            //   image = i?.bytes;
-            //   setState(() {});
-            // }
+            // image = File(file?.path ?? '').readAsBytesSync();
+            // setState(() {});
+
+            for (int j = 1; j <= pages; j++) {
+              try{
+                final page = await document.getPage(j);
+
+                final PdfPageImage? i = await page.render(
+                  width: page.width, //decrement for less quality
+                  height: page.height,
+                  format: PdfPageImageFormat.jpeg,
+                );
+                image = i?.bytes;
+                base64Image = base64Encode(image??[]);
+                List<int> list = utf8.encode(base64Image);
+                Uint8List bytes = Uint8List.fromList(list);
+                imageList.add(bytes);
+                page.close();
+                setState(() {});
+              }catch(e){
+                print(e);
+              }
+            }
           }
         } else {
           image = File(file?.path ?? '').readAsBytesSync();
           setState(() {});
+
+          List<int> imageBytes = image ?? [];
+          base64Image = base64Encode(imageBytes);
+          List<int> list = utf8.encode(base64Image);
+          Uint8List bytes = Uint8List.fromList(list);
+          imageList.add(bytes);
+
         }
-        //fileBytes = (image!.toList() + fileBytes!);
-        //}
       }
-      List<int> imageBytes = image?.map((e) => e).toList() ?? [];
-      base64Image = base64Encode(imageBytes);
+      // List<int> imageBytes = image?.map((e) => e).toList() ?? [];
+      // base64Image = base64Encode(imageBytes);
     }
     setState(() {
       isProcessing = false;
     });
   }
-
+void getPath()
+{
+  imagePath = file?.path;
+}
   void onReject() {
     setState(() {
       file = null;

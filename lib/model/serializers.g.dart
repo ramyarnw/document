@@ -17,11 +17,11 @@ Serializers _$serializers = (new Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(Content)]),
           () => new ListBuilder<Content>())
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(Thread)]),
-          () => new ListBuilder<Thread>())
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => new ListBuilder<String>())
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(int)]),
-          () => new ListBuilder<int>()))
+          const FullType(BuiltList, const [const FullType(Thread)]),
+          () => new ListBuilder<Thread>()))
     .build();
 
 // ignore_for_file: deprecated_member_use_from_same_package,type=lint

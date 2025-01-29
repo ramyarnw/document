@@ -23,7 +23,7 @@ class _$ThreadSerializer implements StructuredSerializer<Thread> {
       'image',
       serializers.serialize(object.image,
           specifiedType:
-              const FullType(BuiltList, const [const FullType(int)])),
+              const FullType(BuiltList, const [const FullType(String)])),
       'aiData',
       serializers.serialize(object.aiData,
           specifiedType: const FullType(String)),
@@ -52,8 +52,8 @@ class _$ThreadSerializer implements StructuredSerializer<Thread> {
           break;
         case 'image':
           result.image.replace(serializers.deserialize(value,
-                  specifiedType:
-                      const FullType(BuiltList, const [const FullType(int)]))!
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(String)]))!
               as BuiltList<Object?>);
           break;
         case 'aiData':
@@ -75,7 +75,7 @@ class _$Thread extends Thread {
   @override
   final String id;
   @override
-  final BuiltList<int> image;
+  final BuiltList<String> image;
   @override
   final String aiData;
   @override
@@ -142,9 +142,9 @@ class ThreadBuilder implements Builder<Thread, ThreadBuilder> {
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
 
-  ListBuilder<int>? _image;
-  ListBuilder<int> get image => _$this._image ??= new ListBuilder<int>();
-  set image(ListBuilder<int>? image) => _$this._image = image;
+  ListBuilder<String>? _image;
+  ListBuilder<String> get image => _$this._image ??= new ListBuilder<String>();
+  set image(ListBuilder<String>? image) => _$this._image = image;
 
   String? _aiData;
   String? get aiData => _$this._aiData;
