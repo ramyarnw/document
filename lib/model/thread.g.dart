@@ -20,10 +20,9 @@ class _$ThreadSerializer implements StructuredSerializer<Thread> {
     final result = <Object?>[
       'id',
       serializers.serialize(object.id, specifiedType: const FullType(String)),
-      'image',
-      serializers.serialize(object.image,
-          specifiedType:
-              const FullType(BuiltList, const [const FullType(String)])),
+      'imagePath',
+      serializers.serialize(object.imagePath,
+          specifiedType: const FullType(String)),
       'aiData',
       serializers.serialize(object.aiData,
           specifiedType: const FullType(String)),
@@ -50,11 +49,9 @@ class _$ThreadSerializer implements StructuredSerializer<Thread> {
           result.id = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
-        case 'image':
-          result.image.replace(serializers.deserialize(value,
-                  specifiedType: const FullType(
-                      BuiltList, const [const FullType(String)]))!
-              as BuiltList<Object?>);
+        case 'imagePath':
+          result.imagePath = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
           break;
         case 'aiData':
           result.aiData = serializers.deserialize(value,
@@ -75,7 +72,7 @@ class _$Thread extends Thread {
   @override
   final String id;
   @override
-  final BuiltList<String> image;
+  final String imagePath;
   @override
   final String aiData;
   @override
@@ -86,12 +83,12 @@ class _$Thread extends Thread {
 
   _$Thread._(
       {required this.id,
-      required this.image,
+      required this.imagePath,
       required this.aiData,
       required this.fileName})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(id, r'Thread', 'id');
-    BuiltValueNullFieldError.checkNotNull(image, r'Thread', 'image');
+    BuiltValueNullFieldError.checkNotNull(imagePath, r'Thread', 'imagePath');
     BuiltValueNullFieldError.checkNotNull(aiData, r'Thread', 'aiData');
     BuiltValueNullFieldError.checkNotNull(fileName, r'Thread', 'fileName');
   }
@@ -108,7 +105,7 @@ class _$Thread extends Thread {
     if (identical(other, this)) return true;
     return other is Thread &&
         id == other.id &&
-        image == other.image &&
+        imagePath == other.imagePath &&
         aiData == other.aiData &&
         fileName == other.fileName;
   }
@@ -117,7 +114,7 @@ class _$Thread extends Thread {
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, image.hashCode);
+    _$hash = $jc(_$hash, imagePath.hashCode);
     _$hash = $jc(_$hash, aiData.hashCode);
     _$hash = $jc(_$hash, fileName.hashCode);
     _$hash = $jf(_$hash);
@@ -128,7 +125,7 @@ class _$Thread extends Thread {
   String toString() {
     return (newBuiltValueToStringHelper(r'Thread')
           ..add('id', id)
-          ..add('image', image)
+          ..add('imagePath', imagePath)
           ..add('aiData', aiData)
           ..add('fileName', fileName))
         .toString();
@@ -142,9 +139,9 @@ class ThreadBuilder implements Builder<Thread, ThreadBuilder> {
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
 
-  ListBuilder<String>? _image;
-  ListBuilder<String> get image => _$this._image ??= new ListBuilder<String>();
-  set image(ListBuilder<String>? image) => _$this._image = image;
+  String? _imagePath;
+  String? get imagePath => _$this._imagePath;
+  set imagePath(String? imagePath) => _$this._imagePath = imagePath;
 
   String? _aiData;
   String? get aiData => _$this._aiData;
@@ -162,7 +159,7 @@ class ThreadBuilder implements Builder<Thread, ThreadBuilder> {
     final $v = _$v;
     if ($v != null) {
       _id = $v.id;
-      _image = $v.image.toBuilder();
+      _imagePath = $v.imagePath;
       _aiData = $v.aiData;
       _fileName = $v.fileName;
       _$v = null;
@@ -185,28 +182,16 @@ class ThreadBuilder implements Builder<Thread, ThreadBuilder> {
   Thread build() => _build();
 
   _$Thread _build() {
-    _$Thread _$result;
-    try {
-      _$result = _$v ??
-          new _$Thread._(
-            id: BuiltValueNullFieldError.checkNotNull(id, r'Thread', 'id'),
-            image: image.build(),
-            aiData: BuiltValueNullFieldError.checkNotNull(
-                aiData, r'Thread', 'aiData'),
-            fileName: BuiltValueNullFieldError.checkNotNull(
-                fileName, r'Thread', 'fileName'),
-          );
-    } catch (_) {
-      late String _$failedField;
-      try {
-        _$failedField = 'image';
-        image.build();
-      } catch (e) {
-        throw new BuiltValueNestedFieldError(
-            r'Thread', _$failedField, e.toString());
-      }
-      rethrow;
-    }
+    final _$result = _$v ??
+        new _$Thread._(
+          id: BuiltValueNullFieldError.checkNotNull(id, r'Thread', 'id'),
+          imagePath: BuiltValueNullFieldError.checkNotNull(
+              imagePath, r'Thread', 'imagePath'),
+          aiData: BuiltValueNullFieldError.checkNotNull(
+              aiData, r'Thread', 'aiData'),
+          fileName: BuiltValueNullFieldError.checkNotNull(
+              fileName, r'Thread', 'fileName'),
+        );
     replace(_$result);
     return _$result;
   }

@@ -28,11 +28,10 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
   final _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
   Future<void> _createThread() async {
-    final BuiltList<int>? i = image?.toBuiltList();
     Thread thread = Thread(
       (t) => t
         ..id = ''
-        ..image = i?.toBuilder()
+        ..imagePath = file?.path ?? ''
         ..aiData = output
         ..fileName = file?.name ?? '',
     );
@@ -68,7 +67,7 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
           floatingActionButton: showFilePicker
               ? PickFileWidget(
-                  pickFile: pickFile,
+                  pickFile: pickFiles,
                 )
               : null,
           body: showThread

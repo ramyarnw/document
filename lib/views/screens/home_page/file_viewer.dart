@@ -9,12 +9,12 @@ import '../../../ui.dart';
 
 class FileViewer extends StatefulWidget {
   const FileViewer({
-    super.key, required this.imageList, required this.imagePath,
+    super.key, required this.imageList, required this.base64Image,
   });
 
   //final Uint8List? image;
-  final String imagePath;
   final List<String>? imageList;
+  final List<String> base64Image;
 
 
   @override
@@ -26,14 +26,14 @@ class _FileViewerState extends State<FileViewer>with StateMixin, ThreadMixin {
   Widget build(BuildContext context) {
     if (widget.imageList != null) {
      // Uint8List fromList = Uint8List.fromList(widget.imageList!.cast<int>());
-      Image image = Image.network(
-           imagePath!
+      Image image = Image.memory(
+           base64Image
           );
       return SizedBox(
         height: 600,
         child: Center(
           child: ListView.builder(
-              itemCount: imageList.length,
+              itemCount: base64Image.length,
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
                   title: image,

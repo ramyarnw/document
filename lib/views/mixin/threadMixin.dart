@@ -15,10 +15,7 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
   bool isProcessing = false;
   PlatformFile? file;
 
-  String base64Image = '';
-  //Uint8List? image;
-  List<String> imageList = [];
-  String? imagePath;
+  List<String> base64Image = [];
 
   void listenThread() {
     try {
@@ -73,7 +70,7 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
     }
   }
 
-  Future<void> pickFile() async {
+  Future<void> pickFiles() async {
     setState(() {
       isProcessing = true;
     });
@@ -89,59 +86,72 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
       if (result != null) {
         file = result.files.first;
         setState(() {});
-        if (file?.extension == 'pdf') {
+        if (isPdf(file)) {
           if (file?.path != null) {
-            final document = await PdfDocument.openFile(file!.path!);
-            final int pages = document.pagesCount;
-            print('page count => $pages');
-            //
-            // image = File(file?.path ?? '').readAsBytesSync();
-            // setState(() {});
-
-            for (int j = 1; j <= pages; j++) {
-              try{
-                final page = await document.getPage(j);
-
-                final PdfPageImage? i = await page.render(
-                  width: page.width, //decrement for less quality
-                  height: page.height,
-                  format: PdfPageImageFormat.jpeg,
-                );
-                image = i?.bytes;
-                base64Image = base64Encode(image??[]);
-                List<int> list = utf8.encode(base64Image);
-                Uint8List bytes = Uint8List.fromList(list);
-                imageList.add(bytes);
-                page.close();
-                setState(() {});
-              }catch(e){
-                print(e);
-              }
-            }
+            List<Uint8List>? data = await processDocument(file!);
+            base64Image = convertToBase64(data ?? <Uint8List>[]);
           }
         } else {
-          image = File(file?.path ?? '').readAsBytesSync();
-          setState(() {});
-
-          List<int> imageBytes = image ?? [];
-          base64Image = base64Encode(imageBytes);
-          List<int> list = utf8.encode(base64Image);
-          Uint8List bytes = Uint8List.fromList(list);
-          imageList.add(bytes);
-
+          List<Uint8List> data = processFile(file!);
+          base64Image = convertToBase64(data);
         }
       }
-      // List<int> imageBytes = image?.map((e) => e).toList() ?? [];
-      // base64Image = base64Encode(imageBytes);
     }
     setState(() {
       isProcessing = false;
     });
   }
-void getPath()
-{
-  imagePath = file?.path;
-}
+
+  Future<List<Uint8List>> getPath(String imagePath) async {}
+
+  File getFile(String path) => File(file?.path ?? '');
+
+  Future<PdfDocument> getDocument(String path) async =>
+      await PdfDocument.openFile(file!.path!);
+
+  bool isPdf(PlatformFile? file) => file?.extension == 'pdf';
+
+  List<Uint8List> processFile(PlatformFile file) {
+    Uint8List image = getFile(file.path ?? '').readAsBytesSync();
+    return [image];
+  }
+
+  Future<List<Uint8List>?> processDocument(PlatformFile file) async {
+    final document = await getDocument(file.path ?? '');
+    final int pages = document.pagesCount;
+
+    for (int j = 1; j <= pages; j++) {
+      try {
+        final page = await document.getPage(j);
+
+        final PdfPageImage? i = await page.render(
+          width: page.width, //decrement for less quality
+          height: page.height,
+          format: PdfPageImageFormat.jpeg,
+        );
+
+        Uint8List? image = i?.bytes;
+        page.close();
+        setState(() {});
+        if (image != null) {
+          return [image];
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+    return null;
+  }
+
+  List<String> convertToBase64(List<Uint8List> image) {
+    List<String> imageList = [];
+    for (var i in image) {
+      String base64 = base64Encode(i);
+      imageList.add(base64);
+    }
+    return imageList;
+  }
+
   void onReject() {
     setState(() {
       file = null;
@@ -152,8 +162,7 @@ void getPath()
     output = '';
     isProcessing = false;
     file = null;
-    base64Image = '';
-    image = null;
+    base64Image = [];
   }
 
   Future<void> getAIImageToData(String base64Image) async {

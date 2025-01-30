@@ -27,7 +27,7 @@ abstract class Thread implements Built<Thread, ThreadBuilder> {
 
   String get id;
 
-  BuiltList<String> get image;
+  String get imagePath;
 
   String get aiData;
 
