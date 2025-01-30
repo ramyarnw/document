@@ -1,4 +1,5 @@
 import 'package:built_collection/built_collection.dart';
+import 'package:document_scanner/provider/provider_utils.dart';
 import 'package:document_scanner/views/components/Threads.dart';
 import 'package:document_scanner/views/mixin/threadMixin.dart';
 import 'package:document_scanner/views/screens/home_page/pick_file_widget.dart';
@@ -31,9 +32,9 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
     Thread thread = Thread(
       (t) => t
         ..id = ''
-        ..imagePath = file?.path ?? ''
+        ..imagePath = path ?? ''
         ..aiData = output
-        ..fileName = file?.name ?? '',
+        ..fileName = name ?? '',
     );
     await createThread(thread: thread);
   }
@@ -42,12 +43,13 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
 
   @override
   Widget build(BuildContext context) {
-    bool showFilePicker = file == null && !isProcessing;
-    bool showPreview = file != null && output == null && !isProcessing;
+    bool showFilePicker = path == null && !isProcessing;
+    bool showPreview = path != null && output == null && !isProcessing;
     bool showSaveButton = output != null;
     bool showAIResponse = showSaveButton;
-    bool showThread = file == null;
-    bool showPreviewButton = (image != null) && (!isProcessing) && (output == null);
+    bool showThread = path == null;
+    bool showPreviewButton =
+        (images != null) && (!isProcessing) && (output == null);
     return MaterialApp(
       scaffoldMessengerKey: _scaffoldMessengerKey,
       themeMode: ThemeMode.dark,
@@ -64,10 +66,13 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
           appBar: ApplicationAppBar(
             title: const AppBoldHeader('Document Scanner '),
           ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
           floatingActionButton: showFilePicker
               ? PickFileWidget(
-                  pickFile: pickFiles,
+                  pickFiles: () async {
+                    await getDataForAI(path??'');
+                  },
                 )
               : null,
           body: showThread
@@ -80,9 +85,9 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         if (showPreview) ...[
-                          FileViewer(
-                            image: image,
-                          ),
+                          FileViewer(getDataForPreview: () async {
+                            await getDataForPreview(path!);
+                          }),
                           const SizedBox(
                             height: 32,
                           ),
@@ -90,7 +95,6 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
                         if (showAIResponse)
                           AIMetaData(
                             output: output,
-                            file: file,
                           ),
                       ],
                     ),
@@ -115,7 +119,11 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
                   );
                 },
                 child: isLoading
-                    ? AppProgressIndicator(size: 12,color: Colors.white, width: 2,)
+                    ? AppProgressIndicator(
+                        size: 12,
+                        color: Colors.white,
+                        width: 2,
+                      )
                     : Center(
                         child: AppText(
                           'Save',
@@ -123,7 +131,11 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
                       ),
               ),
             if (showPreviewButton)
-              PreviewButtons(onAccept: onAccept, onReject: onReject, isProcessing: loading,),
+              PreviewButtons(
+                onAccept: onAccept,
+                onReject: onReject,
+                isProcessing: loading,
+              ),
           ],
         ),
       ),

@@ -23,11 +23,14 @@ class ThreadPage extends StatefulWidget {
 }
 
 class _ThreadPageState extends State<ThreadPage> with StateMixin, ThreadMixin {
+
+
   @override
   Widget build(BuildContext context) {
     Thread? thread = context.appState.getThreadById(widget.id);
-    final Uint8List _image = Uint8List.fromList(thread?.image.toList() ?? []);
-    print('Preview img: $_image');
+    String? path = thread?.imagePath;
+    // final Uint8List _image = Uint8List.fromList(thread?.image.toList() ?? []);
+    // print('Preview img: $_image');
     Size size = MediaQuery.of(context).size;
     double width = size.width;
     double height = size.height;
@@ -46,8 +49,10 @@ class _ThreadPageState extends State<ThreadPage> with StateMixin, ThreadMixin {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              FileViewer(
-                imageList: _image,
+              FileViewer(getDataForPreview: () async {
+                await getDataForPreview(path!);
+              },
+
               ),
               AIMetaData(
                 output: thread?.aiData,

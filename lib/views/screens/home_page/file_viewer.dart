@@ -1,47 +1,52 @@
-
 import 'dart:typed_data';
 
 import 'package:document_scanner/ui.dart';
 import 'package:document_scanner/views/mixin/threadMixin.dart';
 import 'package:document_scanner/views/widgets/mixins.dart';
 
+import '../../../model/thread.dart';
 import '../../../ui.dart';
 
 class FileViewer extends StatefulWidget {
   const FileViewer({
-    super.key, required this.imageList, required this.base64Image,
+    super.key,
+    required this.getDataForPreview,
   });
 
-  //final Uint8List? image;
-  final List<String>? imageList;
-  final List<String> base64Image;
-
+  final Future<List<Uint8List>?> Function() getDataForPreview;
 
   @override
   State<FileViewer> createState() => _FileViewerState();
 }
 
-class _FileViewerState extends State<FileViewer>with StateMixin, ThreadMixin {
+class _FileViewerState extends State<FileViewer> with StateMixin, ThreadMixin {
   @override
   Widget build(BuildContext context) {
-    if (widget.imageList != null) {
-     // Uint8List fromList = Uint8List.fromList(widget.imageList!.cast<int>());
-      Image image = Image.memory(
-           base64Image
-          );
-      return SizedBox(
-        height: 600,
-        child: Center(
-          child: ListView.builder(
-              itemCount: base64Image.length,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  title: image,
-                );
-              }),
-        ),
-      );
-    }
-    return Container();
+    return SizedBox(
+      height: 600,
+      child: Center(
+        child: ListView.builder(
+            itemCount: images.length,
+            itemBuilder: (BuildContext context, int index) {
+              return ListTile(
+                image: images[index],
+              );
+            }),
+      ),
+    );
+      return Container();
+  }
+}
+class ListTile extends StatefulWidget {
+  const ListTile({super.key, required this.image,});
+final Uint8List image;
+  @override
+  State<ListTile> createState() => _ListTileState();
+}
+
+class _ListTileState extends State<ListTile>with StateMixin,ThreadMixin {
+  @override
+  Widget build(BuildContext context) {
+    return Image.memory(widget.image);
   }
 }

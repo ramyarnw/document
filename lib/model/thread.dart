@@ -22,7 +22,8 @@ abstract class Thread implements Built<Thread, ThreadBuilder> {
   static Serializer<Thread> get serializer => _$threadSerializer;
 
   static void _initializeBuilder(ThreadBuilder b) {
-    b.fileName = '';
+    b..fileName = ''..imagePath ='';
+
   }
 
   String get id;
