@@ -14,9 +14,8 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
   bool isProcessing = false;
   List<String> base64Image = [];
   List<Uint8List> images = [];
-
- String? path;
- String? name;
+  String? path;
+  String? name;
 
   void listenThread() {
     try {

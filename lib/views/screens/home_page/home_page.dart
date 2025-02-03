@@ -1,5 +1,3 @@
-import 'package:built_collection/built_collection.dart';
-import 'package:document_scanner/provider/provider_utils.dart';
 import 'package:document_scanner/views/components/Threads.dart';
 import 'package:document_scanner/views/mixin/threadMixin.dart';
 import 'package:document_scanner/views/screens/home_page/pick_file_widget.dart';
@@ -49,7 +47,8 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
     bool showAIResponse = showSaveButton;
     bool showThread = path == null;
     bool showPreviewButton =
-        (images != null) && (!isProcessing) && (output == null);
+        (!isProcessing) && (output == null) && (path != null);
+    print('showPreview: $path');
     return MaterialApp(
       scaffoldMessengerKey: _scaffoldMessengerKey,
       themeMode: ThemeMode.dark,
@@ -71,7 +70,7 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
           floatingActionButton: showFilePicker
               ? PickFileWidget(
                   pickFiles: () async {
-                    await getDataForAI(path??'');
+                    await getDataForAI(path ?? '');
                   },
                 )
               : null,
@@ -85,9 +84,7 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         if (showPreview) ...[
-                          FileViewer(getDataForPreview: () async {
-                            await getDataForPreview(path!);
-                          }),
+                          FileViewer(path: path!),
                           const SizedBox(
                             height: 32,
                           ),

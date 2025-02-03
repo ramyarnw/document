@@ -26,11 +26,7 @@ class _AIMetaDataState extends State<AIMetaData> with StateMixin, ThreadMixin {
     return Column(
       children: [
         if (path != null) ...[
-          FileViewer(getDataForPreview: () async{
-            getDataForPreview(path!);
-          },
-
-          ),
+          FileViewer(path: path!),
           const SizedBox(
             height: 16,
           ),
