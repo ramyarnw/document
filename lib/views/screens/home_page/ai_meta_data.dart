@@ -45,9 +45,8 @@ class _AIMetaDataState extends State<AIMetaData> with StateMixin {
       children: [
         ...[
           FileViewer(
-            path: widget.path, getDataForPreview: (String path) async {
-            widget.getDataForPreview(path);
-          },),
+            path: widget.path, getDataForPreview: widget.getDataForPreview
+          ,),
           const SizedBox(
             height: 16,
           ),
