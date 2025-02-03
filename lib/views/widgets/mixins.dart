@@ -13,10 +13,16 @@ mixin StateMixin<T extends StatefulWidget> on State<T> {
   }
 
   Future<void> showSnack(String text) async {
-    context.scaffoldMessenger.showSnackBar(SnackBar(
+    scaffoldMessenger.showSnackBar(SnackBar(
       content: Text(text),
       duration: const Duration(seconds: 2),
     ));
+  }
+
+  ScaffoldMessengerState? _sm;
+  ScaffoldMessengerState get scaffoldMessenger {
+    _sm ??= context.scaffoldMessenger;
+    return _sm!;
   }
 
   bool _loading = false;

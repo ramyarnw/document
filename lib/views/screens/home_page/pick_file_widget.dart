@@ -17,15 +17,13 @@ class PickFileWidget extends StatefulWidget {
   State<PickFileWidget> createState() => _PickFileWidgetState();
 }
 
-class _PickFileWidgetState extends State<PickFileWidget> with StateMixin,ThreadMixin{
+class _PickFileWidgetState extends State<PickFileWidget> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: 120,
       child: FloatingActionButton.extended(
-        onPressed: () {
-          pickFiles();
-        },
+        onPressed:widget.pickFiles,
         label: AppBoldTitle('Pick files'),
         icon: const AppIcon(Icons.description),
       ),

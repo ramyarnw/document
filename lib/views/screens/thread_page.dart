@@ -23,10 +23,27 @@ class ThreadPage extends StatefulWidget {
 }
 
 class _ThreadPageState extends State<ThreadPage> with StateMixin, ThreadMixin {
+  List<Uint8List>? imageList;
+  List<String>? base64List;
+  Thread? thread;
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+  Future<void> getData() async {
+    setLoading();
+    thread = context.appViewModel.getState().getThreadById(widget.id);
+    String? path = thread?.imagePath;
+    imageList = await getDataForPreview(path ?? '');
+    base64List = await getDataForAI(path ?? '');
+    resetLoading();
+  }
+
   @override
   Widget build(BuildContext context) {
-    Thread? thread = context.appState.getThreadById(widget.id);
-    String? path = thread?.imagePath;
     Size size = MediaQuery.of(context).size;
     double width = size.width;
     double height = size.height;
@@ -35,7 +52,7 @@ class _ThreadPageState extends State<ThreadPage> with StateMixin, ThreadMixin {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            AppHeader(thread?.fileName ?? 'Preview'),
+            AppSubtitle(thread?.fileName ?? 'Preview'),
           ],
         ),
       ),
@@ -43,14 +60,22 @@ class _ThreadPageState extends State<ThreadPage> with StateMixin, ThreadMixin {
         width: width,
         height: height,
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              FileViewer(path: path!),
-              AIMetaData(
-                output: thread?.aiData,
-              ),
-            ],
-          ),
+          child: loading
+              ? CircularProgressIndicator()
+              : Column(
+                  children: [
+                    FileViewer(
+                      path: path ?? '',
+                      getDataForPreview: (String path) async {},
+                    ),
+                    AIMetaData(
+                      output: thread?.aiData,
+                      path: path ?? '',
+                      getDataForAI: getDataForAI,
+                      getDataForPreview: getDataForPreview,
+                    ),
+                  ],
+                ),
         ),
       ),
     );

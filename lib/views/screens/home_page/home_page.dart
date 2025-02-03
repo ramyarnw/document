@@ -69,9 +69,7 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
               FloatingActionButtonLocation.centerFloat,
           floatingActionButton: showFilePicker
               ? PickFileWidget(
-                  pickFiles: () async {
-                    await getDataForAI(path ?? '');
-                  },
+                  pickFiles: pickFiles,
                 )
               : null,
           body: showThread
@@ -84,7 +82,10 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         if (showPreview) ...[
-                          FileViewer(path: path!),
+                          FileViewer(
+                            path: path ?? '',
+                            getDataForPreview: getDataForPreview,
+                          ),
                           const SizedBox(
                             height: 32,
                           ),
@@ -92,6 +93,9 @@ class _HomePageState extends State<HomePage> with StateMixin, ThreadMixin {
                         if (showAIResponse)
                           AIMetaData(
                             output: output,
+                            path: path ?? '',
+                            getDataForAI: getDataForAI,
+                            getDataForPreview: getDataForPreview,
                           ),
                       ],
                     ),

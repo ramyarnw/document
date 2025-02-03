@@ -83,6 +83,7 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
       PlatformFile file = result.files.first;
       path = file.path;
       name = file.name;
+      refresh();
       return getDataForPreview(path!);
     }
     return null;
@@ -97,14 +98,12 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
   }
 
   Future<List<String>> getDataForAI(String path) async {
-    setState(() {
-      isProcessing = true;
-    });
+    isProcessing = true;
+
     List<Uint8List>? data = await getDataForPreview(path);
     base64Image = convertToBase64(data!);
-    setState(() {
-      isProcessing = false;
-    });
+    isProcessing = false;
+
     return base64Image;
   }
 
@@ -167,6 +166,7 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
 
   Future<void> getAIImageToData(String base64Image) async {
     try {
+      scaffoldMessenger; // set's messenger from context;
       output = await context.appViewModel.getAIImageToData(base64Image);
       showSnack('AI data extracted');
     } catch (e) {
@@ -176,8 +176,11 @@ mixin ThreadMixin<T extends StatefulWidget> on StateMixin<T> {
 
   Future<void> onAccept() async {
     setLoading();
-    for (String base64 in base64Image) {
-      await getAIImageToData(base64);
+    if (path != null) {
+      await getDataForAI(path!);
+      for (String base64 in base64Image) {
+        await getAIImageToData(base64);
+      }
     }
     resetLoading();
   }

@@ -7,39 +7,48 @@ class FileViewer extends StatefulWidget {
   const FileViewer({
     super.key,
     required this.path,
+    required this.getDataForPreview,
   });
 
   final String path;
+  final Future<List<Uint8List>?> Function(String path) getDataForPreview;
 
   @override
   State<FileViewer> createState() => _FileViewerState();
 }
 
-List<Uint8List>? imageList;
+class _FileViewerState extends State<FileViewer> with StateMixin {
+  List<Uint8List>? imageList;
 
-class _FileViewerState extends State<FileViewer> with StateMixin, ThreadMixin {
   @override
-  Future<void> initState() async {
+  void initState() {
     super.initState();
+    getData();
+  }
+
+  Future<void> getData() async {
     setLoading();
-    imageList = await getDataForPreview(widget.path).then((_) {
-      resetLoading();
-    });
+    imageList = await widget.getDataForPreview(widget.path);
+    resetLoading();
   }
 
   @override
   Widget build(BuildContext context) {
+    var hasImages = (imageList == null) || (imageList?.isEmpty ?? false);
+    print('imageList: $imageList, hasImages: $hasImages');
     return SizedBox(
       height: 600,
       child: loading
           ? const AppProgressIndicator(width: 56)
-          : ListView.builder(
-              itemCount: imageList?.length,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  image: imageList![index],
-                );
-              }),
+          : hasImages
+              ? Container()
+              : ListView.builder(
+                  itemCount: imageList!.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                      image: imageList![index],
+                    );
+                  }),
     );
     return Container();
   }
